@@ -1,0 +1,66 @@
+#+TITLE: Maths Styled in Orgmode
+#+AUTHOR: Philip Yang
+#+OPTIONS: html-link-use-abs-url:nil html-postamble:auto
+#+OPTIONS: html-preamble:t html-scripts:t html-style:t
+#+OPTIONS: html5-fancy:t tex:t
+#+CREATOR: <a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.3.1 (<a href="http://orgmode.org">Org</a> mode 8.2.5h)
+#+HTML_CONTAINER: div
+#+HTML_DOCTYPE: html5
+#+HTML_HEAD: 
+#+HTML_HEAD_EXTRA: <meta charset='utf-8'> 
+#+HTML_HEAD_EXTRA: <meta http-equiv="X-UA-Compatible" content="chrome=1">  
+#+HTML_HEAD_EXTRA: <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'> 
+#+HTML_HEAD_EXTRA: <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" /> 
+#+HTML_HEAD_EXTRA: <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" /> 
+#+HTML_HEAD_EXTRA: <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+#+HTML_LINK_HOME:
+#+HTML_LINK_UP:
+#+HTML_MATHJAX: mathml:t 
+#+INFOJS_OPT: view:showall toc:t
+#+LATEX_HEADER: \usepackage{mathtools}
+#+LATEX_HEADER: \usepackage{amsthm}
+#+LATEX_HEADER: \usepackage[T1]{fontenc} 
+#+LATEX_HEADER: \usepackage[scaled]{beraserif}
+#+LATEX_HEADER: \usepackage[scaled]{berasans} 
+#+LATEX_HEADER: \usepackage[scaled]{beramono}
+
+
+More information on [[http://orgmode.org/manual/HTML-export.html][orgmode HTML export]]. $A + B \in R$
+
+  \begin{equation} 
+    \begin{split}
+      I(X;Y;Z) &= \mathbb{E}_{X,Y,Z}\left[ \log(\frac{p_M(X,Y,Z)}{p_M(X) p_M(Y) p_M(Z)}) \right] \\
+      &= H(X) + H(Y) + H(Z) - H(X,Y,Z) \\
+      &= H(X) + H(Y) - H(X,Y) + H(X,Y) + H(Z) - H(X,Y,Z) \\
+      &= I(X; Y) + I(X, Y; Z).
+    \end{split}
+  \end{equation}
+
+- Theorem :: 
+     - Let $G(V,E)$ be Erdos-Reyni, $|V| = n$. 
+     - Let $d(n)$ be the average degree of the $G$. 
+     - If $d(n) \geq (1+\epsilon)\log(n)$ for some $\epsilon > 0$ and 
+       $\frac{d(n)}{n} \rightarrow 0$, then with high probability, 
+       $$ \frac{AvgDist(n)}{\log_{d(n)}(n)} \rightarrow 1 $$
+       
+
+
+#+BEGIN_SRC R :results output graphics :exports all :file images/R_ggplot2.png
+  library(ggplot2)
+  a <- rnorm(100)
+  b <- 2*a + rnorm(100)
+  df <- data.frame(a, b)
+  
+  ## Scatter plot with regression line
+  p <- ggplot(df, aes(x = a, y = b))
+  p + geom_smooth(method = "lm", se=TRUE, color="red", formula = y ~ x) +
+      geom_point()    
+#+END_SRC
+
+#+CAPTION: Output file of the R code
+#+ATTR_HTML: :align center
+#+RESULTS:
+[[file:images/R_ggplot2.png]]
+
+
+
