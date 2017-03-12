@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.11.2/css/ol.css" type="text/css">
+    <style>
+    .map {
+      height: 640px;
+      width: 100%;
+    }
+    </style>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.11.2/css/ol.css" type="text/css">
+    
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="http://openlayers.org/en/v3.11.2/build/ol.js"></script>
+
+    <title>NYPD Vehicle Collisions</title>
+  </head>
+  <body>
+    <div id="map" class="map"></div>
+    <script type="text/javascript">
+
+    /* Basic NYC geo info */
+    var nyc = {};
+    nyc.lonlat = [-73.985428, 40.748817];
+    nyc.extent = [
+      -74.032, 40.685,
+      -73.902, 40.876
+    ];
+
+    /* Tile layers */
+    var tile_layer = {};
+    tile_layer.mapquest = new ol.layer.Tile({
+      source: new ol.source.MapQuest({layer: 'sat'})
+    });
+    tile_layer.stamen = new ol.layer.Tile({
+      source: new ol.source.Stamen({layer: 'toner'})
+    });
+
+    /* List of map control elements */
+    var listAppControls = [
+      new ol.control.FullScreen(),
+    ];
+
+    /* The actual map object */
+    var map = new ol.Map({
+      target: 'map',
+      layers: [
+	tile_layer.stamen,
+	//tile_layer.mapquest,
+      ],
+      view: new ol.View({
+        center: ol.proj.fromLonLat(nyc.lonlat),
+	zoom: 14,
+	//extent: nyc.extent,
+	minZoom: 12,
+	maxZoom: 19,
+      }),
+      controls: ol.control.defaults().extend(listAppControls),      
+    });
+
+    var vecLayer = new ol.layer.Heatmap({
+      source: new ol.source.Vector({
+	url: '._geojson_olyr3_render/collisions_latlon.json',
+	format: new ol.format.GeoJSON()
+      }),
+      blur: 10,
+      radius: 10,
+    });
+
+    map.addLayer(vecLayer);
+    
+    </script>
+  </body>
+</html>

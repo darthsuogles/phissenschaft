@@ -1,0 +1,11 @@
+
+To use the package, consider the following snippet.
+
+#+BEGIN_SRC python
+  import pandas as pd
+  from nyc_vehicle_collisions_analysis.proc_nyc_geoloc import draw_coords_heatmap
+
+  df = pd.read_csv("<path/to/your_csv_file.csv>")
+  df_coords = df.rename(columns = {'LATITUDE': 'lat', 'LONGITUDE':'lon'})[['lat', 'lon']].dropna()
+  draw_coords_heatmap(df_coords)
+#+END_SRC
