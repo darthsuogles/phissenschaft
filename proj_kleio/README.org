@@ -1,0 +1,27 @@
+
+* About
+  <2014-09-02 Tue>
+  
+  We provide a uniform way to search several popular academic article databases,
+  to extract information such as 
+  - article content
+  - authors list
+  - date of publication
+  - references
+  - figures and plots
+
+   
+  Semantic informations related to neuro-science are treated with special care
+  - standard brain coordinates
+  - type of method and statistics
+  - imaging modalities: fMRI, EEG, MEG, etc.
+  - meta-data for participants
+
+* Installation
+  <2014-09-02 Tue>
+  
+  To install the prerequisite python packages, run the following.
+  #+BEGIN_SRC sh
+    pip install -U -r requirements.txt
+  #+END_SRC
+
