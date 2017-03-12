@@ -1,0 +1,21 @@
+
+We use PDFBox to extract data into text format which normal language processing libraries 
+could work with. 
+
+In a research paper, there is always a reference section where all 
+the cited papers are listed. 
+There is no consensus on how such references are formatted, despite the existence of many
+standards (APA6, Chicago, etc.). However, usually a few things must be present
+- Names of the authors.
+- Title of the cited article.
+- Venue of publication, which could be a conference, a journal or something else.
+- Date of the publication, which contains at least the year. 
+
+A paper listed in the reference section must be cited somewhere in the article. 
+Yet neither is there a standard format for this. 
+
+There are some consistency after all. 
+For every paper, there should be only one reference style. 
+
+A first task would be to find all the references. 
+
