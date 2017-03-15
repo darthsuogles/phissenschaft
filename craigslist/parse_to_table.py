@@ -91,15 +91,25 @@ class ParseCraigslist(object):
 
 
 if __name__ == "__main__":
-
-    url_params = {
+    
+    params_uniq = {
         'hasPic': 1,
-        'search_distance': 3,
-        'postal': '94025',
-        'min_price': 1000,
-        'max_price': 2000,
+        'search_distance': 14,
+        'postal': 94400,
+        'pets_cat': 1,
+        'bedrooms': 1,
+        'bathrooms': 1,
+        'min_price': 2400,
+        'max_price': 3400,
     }
-    req = requests.get('http://sfbay.craigslist.org/search/pen/roo', params=url_params)
+    haus_loc = 'pen'
+    haus_type = 'apa'
+    areas = [('nh', nh) for nh in [71, 77, 84, 85, 86, 87, 88]]
+    url_params = list(params_uniq.items()) + areas
+
+    req = requests.get('http://sfbay.craigslist.org/search/{}/{}'
+                       .format(haus_loc, haus_type), 
+                       params=url_params)
     if 200 != req.status_code:
         print('Error: request failed')
         exit(1)
