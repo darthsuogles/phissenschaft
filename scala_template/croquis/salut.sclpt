@@ -1,0 +1,38 @@
+/** Scala script mode */
+val a = 1 + 2 + 3
+
+def sumArray(arr: Seq[Int]) = arr.sum
+
+sealed trait TreeNode
+
+final case class EmptyNode() extends TreeNode
+
+final case class BinaryNode(
+  value: Int,
+  left: TreeNode,
+  right: TreeNode
+) extends TreeNode
+
+final case class LeafNode(
+  value: Int
+) extends TreeNode
+
+def depth(root: TreeNode): Int = root match {
+  case BinaryNode(_, left, right) =>
+    Math.max(depth(left), depth(right)) + 1
+  case LeafNode(_) => 1
+  case EmptyNode() => 0
+}
+
+val root = BinaryNode(7,
+  BinaryNode(3,
+    EmptyNode(),
+    LeafNode(4)
+  ),
+  BinaryNode(9,
+    LeafNode(11),
+    LeafNode(12)
+  )
+)
+
+depth(root)
