@@ -23,7 +23,7 @@ lazy val akka = Seq(
 // Build a runnable script with all dependencies
 lazy val genClasspath = taskKey[Unit]("Build runnable script with classpath")
 
-lazy val stdSettings = Seq(
+lazy val stdSettings = commonSettings ++ Seq(
   genClasspath := {
     import java.io.PrintWriter
     // Find all jar dependencies and construct a classpath string
@@ -35,8 +35,16 @@ lazy val stdSettings = Seq(
   }
 )
 
+lazy val repl = (project in file("repl")).
+  settings(stdSettings: _*).
+  settings(
+    name := "repl",
+    libraryDependencies ++= akka ++ Seq(
+      "com.lihaoyi" % s"ammonite_${scalaVer}" % "0.8.2"
+    )
+  )
+
 lazy val root = (project in file(".")).
-  settings(commonSettings: _*).
   settings(stdSettings: _*).
   settings(
     name := "template",
