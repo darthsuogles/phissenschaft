@@ -40,7 +40,8 @@ lazy val repl = (project in file("repl")).
   settings(
     name := "repl",
     libraryDependencies ++= akka ++ Seq(
-      "com.lihaoyi" % s"ammonite_${scalaVer}" % "0.8.2"
+      "com.lihaoyi" % s"ammonite_${scalaVer}" % "0.8.2",
+      "org.scalameta" %% "scalameta" % "1.7.0"
     )
   )
 
