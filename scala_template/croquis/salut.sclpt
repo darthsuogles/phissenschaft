@@ -3,19 +3,23 @@ val a = 1 + 2 + 3
 
 def sumArray(arr: Seq[Int]) = arr.sum
 
-sealed trait TreeNode
+object ADT {
+  sealed trait TreeNode
 
-final case class EmptyNode() extends TreeNode
+  final case class EmptyNode() extends TreeNode
 
-final case class BinaryNode(
-  value: Int,
-  left: TreeNode,
-  right: TreeNode
-) extends TreeNode
+  final case class BinaryNode(
+    value: Int,
+    left: TreeNode,
+    right: TreeNode
+  ) extends TreeNode
 
-final case class LeafNode(
-  value: Int
-) extends TreeNode
+  final case class LeafNode(
+    value: Int
+  ) extends TreeNode
+}
+
+import ADT._
 
 def depth(root: TreeNode): Int = root match {
   case BinaryNode(_, left, right) =>
