@@ -118,3 +118,7 @@ val objFn = new DiffFunction[DenseVector[Double]] {
 }
 val lbfgs = new LBFGS[DenseVector[Double]](maxIter=100, m=3)
 lbfgs.minimize(objFn, DenseVector(0, 0, 0, 0))
+
+
+import org.apache.spark.sql.SparkSession
+val spark = SparkSession.builder.master("local[2]").getOrCreate()

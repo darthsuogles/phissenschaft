@@ -39,8 +39,9 @@ lazy val repl = (project in file("repl")).
   settings(stdSettings: _*).
   settings(
     name := "repl",
-    libraryDependencies ++= akka ++ Seq(
-      "com.lihaoyi" % s"ammonite_${scalaVer}" % "0.8.2",
+    scalaVersion := "2.11.8",
+    libraryDependencies ++= Seq(
+      "com.lihaoyi" % s"ammonite_${scalaVersion.value}" % "0.8.4",
       "org.scalameta" %% "scalameta" % "1.7.0"
     )
   )
@@ -49,7 +50,7 @@ lazy val root = (project in file(".")).
   settings(stdSettings: _*).
   settings(
     name := "template",
-    libraryDependencies ++= akka ++ Seq(
-      "com.lihaoyi" % s"ammonite_${scalaVer}" % "0.8.2"
+    libraryDependencies ++= Seq(
+      "com.lihaoyi" % s"ammonite_${scalaVer}" % "0.8.4"
     )
   )
