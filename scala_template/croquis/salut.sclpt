@@ -73,7 +73,6 @@ object FPath {
   object Implicits {
     implicit def str2fpath(s: String): FPath = new FPath(Paths.get(s))
   }
-  import Implicits._
   lazy val home = new FPath(Paths.get(System.getProperty("user.home")))
 }
 
@@ -88,6 +87,34 @@ def loadJars(jars: Seq[String]): Unit = {
 loadJars(Seq("stanford-corenlp-3.7.0-models-english.jar"))
 
 import edu.stanford.nlp.pipeline._
+
 val props = new java.util.Properties()
 props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
 val pipeline = new StanfordCoreNLP(props);
+val annotDoc = new Annotation("able was I ere I saw elba")
+pipeline.annotate(annotDoc)
+
+import edu.stanford.nlp.ling.CoreAnnotations._
+import scala.collection.JavaConverters._
+val sents = annotDoc.get(classOf[SentencesAnnotation]).asScala
+val toks = sents.head.get(classOf[TokensAnnotation]).asScala
+toks.zipWithIndex.foreach { case (tok, idx) =>
+  val word = tok.get(classOf[TextAnnotation])
+  val pos = tok.get(classOf[PartOfSpeechAnnotation])
+  val ent = tok.get(classOf[NamedEntityTagAnnotation])
+  println(f"${idx}% 3d: ${word}%16s :: ${pos}%5s :: ${ent}%7s")
+}
+
+//interp.load.ivy("org.apache.spark" %% "spark-core" % "2.1.0")
+interp.load.ivy("org.scalanlp" %% "breeze" % "0.13")
+import breeze.linalg._
+import breeze.optimize._
+
+val A = CSCMatrix.zeros[Int](3, 2)
+val objFn = new DiffFunction[DenseVector[Double]] {
+  def calculate(x: DenseVector[Double]) = {
+    (norm((x - 3d) :^ 2d, 1d), (x * 2d) - 6d)
+  }
+}
+val lbfgs = new LBFGS[DenseVector[Double]](maxIter=100, m=3)
+lbfgs.minimize(objFn, DenseVector(0, 0, 0, 0))
