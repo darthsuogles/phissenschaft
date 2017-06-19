@@ -13,9 +13,16 @@ object GenClasspathPlugin extends AutoPlugin {
     */
   object autoImport {
     // Build a runnable script with all dependencies
-    val genClasspath = taskKey[Unit]("Build runnable script with classpath")
+    lazy val genClasspath = taskKey[Unit]("Build runnable script with classpath")
+    lazy val checkArts = taskKey[Unit]("Check included artifacts")
 
     lazy val baseGenClasspathSettings: Seq[Def.Setting[_]] = Seq(
+      checkArts := {
+        val (art, file) = packagedArtifact.in(Compile, packageBin).value
+        println("Artifact definition: " + art)
+        println("Packaged file: " + file.getAbsolutePath)
+      },
+
       genClasspath := {
         import java.io.PrintWriter
         // Find all jar dependencies and construct a classpath string
