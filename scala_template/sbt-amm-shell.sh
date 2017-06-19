@@ -3,24 +3,51 @@
 OS="$(uname -s | tr [:upper:] [:lower:])"
 if [[ "darwin" == "${OS}" ]]; then
     which greadlink &>/dev/null || brew install coreutils
-    function rlq { greadlink -f $@; }
+    function tracelink { greadlink -f $@; }
 else
-    function rlq { readlink -f $@; }
+    function tracelink { readlink -f $@; }
 fi
 
-_bsd_="$(cd "$(dirname "$(rlq "${BASH_SOURCE[0]}")")" && pwd)"
+_bsd_="$(cd "$(dirname "$(tracelink "${BASH_SOURCE[0]}")")" && pwd)"
 
+JAVA_OPTS="-Xmx4G -Xms32M"
+_jvm_agent="$(find ${_bsd_}/agent/target -name '*.jar' | sort | uniq | head -n1)"
+_opt_interp=${INTERP:-mod}
+
+function java_exec {
+    java ${JAVA_OPT} \
+         -javaagent:"${_jvm_agent}" \
+         $@
+}
+
+# TODO: Ammonite does not pass instrument libraries to the REPL
 # Using the default Ammonite REPL 
 function repl_amm {
-    java -cp "$(cat "${_bsd_}/SBT_RUNTIME_CLASSPATH")" \
-         ammonite.Main \
-         --predef='repl.prompt() = "scala> "; repl.frontEnd() = ammonite.repl.FrontEnd.JLineUnix; repl.colors() = ammonite.util.Colors.BlackWhite' \
-         $@
+    java_exec \
+        -cp "$(cat "${_bsd_}/repl/SBT_RUNTIME_CLASSPATH")" \
+        ammonite.Main \
+        $@
 }
 
 # Using our customized Ammonite based REPL
 function repl_mod {
-    java -cp "$(cat "${_bsd_}/repl/SBT_RUNTIME_CLASSPATH")" y.phi9t.repl.ReplMain $@
+    java_exec \
+         -cp "$(cat "${_bsd_}/repl/SBT_RUNTIME_CLASSPATH")" \
+         y.phi9t.repl.ReplMain \
+         $@
 }
 
-repl_mod
+# Using standard Scala REPL
+function repl_scala {
+    java_exec \
+        -Dscala.usejavacp=true \
+        -cp "$(cat "${_bsd_}/repl/SBT_RUNTIME_CLASSPATH")" \
+        scala.tools.nsc.MainGenericRunner \
+        $@
+}
+
+case "${_opt_interp}" in 
+    mod) repl_mod ;;
+    amm) repl_amm ;;
+    scala) repl_scala ;;
+esac
