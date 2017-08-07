@@ -4,8 +4,8 @@ import sbt._
 
 object LibVer {
   lazy val scala = "2.11.11"
-  lazy val spark = "2.1.1"
-  lazy val ammonite = "0.9.9"
+  lazy val spark = "2.2.0"
+  lazy val ammonite = "1.0.0"
   lazy val scalameta = "1.7.0"
   lazy val akka = "2.4.17"
 }

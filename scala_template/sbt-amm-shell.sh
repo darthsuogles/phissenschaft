@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu
+
 OS="$(uname -s | tr [:upper:] [:lower:])"
 if [[ "darwin" == "${OS}" ]]; then
     which greadlink &>/dev/null || brew install coreutils
@@ -11,14 +13,10 @@ fi
 _bsd_="$(cd "$(dirname "$(tracelink "${BASH_SOURCE[0]}")")" && pwd)"
 
 JAVA_OPTS="-Xmx4G -Xms32M"
-_jvm_agent="$(find ${_bsd_}/agent/target -name '*.jar' | sort | uniq | head -n1)"
-_opt_interp=${INTERP:-mod}
+_jvm_agent="${_bsd_}/agent/.agents/mem-inst.jar"
+_opt_interp="${INTERP:-mod}"
 
-function java_exec {
-    java ${JAVA_OPT} \
-         -javaagent:"${_jvm_agent}" \
-         $@
-}
+function java_exec { java ${JAVA_OPTS} -javaagent:"${_jvm_agent}" $@ ; }
 
 # TODO: Ammonite does not pass instrument libraries to the REPL
 # Using the default Ammonite REPL 

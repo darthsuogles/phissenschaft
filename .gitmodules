@@ -7,3 +7,6 @@
 [submodule "scala_template/spark-corenlp"]
 	path = scala_template/spark-corenlp
 	url = https://github.com/databricks/spark-corenlp.git
+[submodule "pixsrl/deck.gl"]
+	path = pixsrl/deck.gl
+	url = https://github.com/uber/deck.gl.git

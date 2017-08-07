@@ -29,11 +29,12 @@ object ReplMain extends App {
   val predef = """
   |repl.prompt() = "scala> ";
   |repl.frontEnd() = ammonite.repl.FrontEnd.JLineUnix;
-  |repl.colors() = ammonite.util.Colors.BlackWhite
 """.stripMargin
 
+  // https://github.com/lihaoyi/Ammonite/blob/1.0.0/amm/src/main/scala/ammonite/Main.scala#L57
   val replMain = AmmReplMain(
-    predef = predef,
+    predefCode = predef,
+    colors = Colors.BlackWhite,
     welcomeBanner = Some(welcomeBanner)
   )  
 

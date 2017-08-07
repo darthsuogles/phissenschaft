@@ -24,7 +24,8 @@ lazy val agent = (project in file("agent")).
   settings(
     assemblyJarName in assembly := "mem-inst.jar",
     packageOptions in (Compile, packageBin) +=
-      Package.ManifestAttributes("Premain-Class" -> "ObjectSizeFetcher"),
+      Package.ManifestAttributes(
+        "Premain-Class" -> "y.phi9t.instrument.ObjectSizeFetcher"),
     assemblyOutputPath in assembly := {
       val outFP = baseDirectory.value / ".agents" / (assemblyJarName in assembly).value
       println(outFP)
