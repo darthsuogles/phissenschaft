@@ -195,7 +195,7 @@ class MatMulOp(Op):
         if node.matmul_attr_trans_A: A = A.T
         B = input_vals[1]
         if node.matmul_attr_trans_B: B = B.T
-        return A @ B
+        return A @ B  # will only work for python3
 
     def gradient(self, node, output_grad):
         """Given gradient of multiply node, return gradient contributions to each input.
@@ -203,8 +203,9 @@ class MatMulOp(Op):
         Useful formula: if Y=AB, then dA=dY B^T, dB=A^T dY
         """
         A, B = node.inputs
-        return [matmul_op(output_grad, B, False, True), 
-                matmul_op(A, output_grad, True, False)]
+        dA = matmul_op(output_grad, B, False, not node.matmul_attr_trans_B)
+        dB = matmul_op(A, output_grad, not node.matmul_attr_trans_A, False)
+        return [dA, dB]
 
 class PlaceholderOp(Op):
     """Op to feed value to a nodes."""
