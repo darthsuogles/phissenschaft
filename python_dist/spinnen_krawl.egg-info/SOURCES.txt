@@ -1,0 +1,7 @@
+setup.py
+crawler/__init__.py
+crawler/cli.py
+spinnen_krawl.egg-info/PKG-INFO
+spinnen_krawl.egg-info/SOURCES.txt
+spinnen_krawl.egg-info/dependency_links.txt
+spinnen_krawl.egg-info/top_level.txt

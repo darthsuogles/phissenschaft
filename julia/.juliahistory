@@ -1,0 +1,16 @@
+exit
+Pkg.add("Cxx")
+using Cxx
+exit
+exit()
+using Cxx
+Pkg.update()
+<
+using Cxx
+#include <iostream>
+using namespace std;
+cout << "salut tout le monde" <<endl;
+using Cxx
+Using Spark
+Using spark
+using Spark

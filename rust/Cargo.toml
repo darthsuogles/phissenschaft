@@ -1,0 +1,7 @@
+[package]
+name = "phissenschaft"
+version = "0.1.0"
+authors = ["Philip Yang <phissenschaft@gmail.com>"]
+
+[dependencies]
+tensorflow = "0.4.0"

@@ -1,0 +1,27 @@
+#!/bin/bash
+# -*- shell-script mode -*-
+
+_bsd_="$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)"
+
+jar_dir="${_bsd_}/._stanford_corenlp"
+
+function fetch_corenlp {
+    echo "Download latest Stanford CoreNLP"    
+    local tarball="stanford-corenlp-full-2016-10-31.zip"
+    local url="http://nlp.stanford.edu/software/${tarball}"
+    [[ -f "${tarball}" ]] || wget "${url}" || curl -LO "${url}"
+    unzip "${tarball}" && rm -f "${tarball}"
+}
+
+[[ -d "${jar_dir}" ]] || (
+    mkdir -p "${jar_dir}" && cd $_
+    fetch_corenlp
+)
+
+function join { local IFS=':'; echo "$*"; }
+classpath="$(join $(find "${_bsd_}/._stanford_corenlp" -name '*.jar'))"
+
+java -mx4g -cp "${classpath}" \
+     edu.stanford.nlp.pipeline.StanfordCoreNLPServer \
+     -port 9000 \
+     -timeout 15000
