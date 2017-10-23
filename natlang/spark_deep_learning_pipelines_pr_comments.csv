@@ -1,0 +1,951 @@
+,text,time_created,user
+0,can you add some documentation that explains the return type?,2017-06-04 22:47:17,thunterdb
+1,"so this is the magic line, I gather? Because we are using PIL under the hood?
+
+I would love to eventually replace this python UDF by either a scala UDF or a tensorflow resizing element.",2017-06-04 22:48:52,thunterdb
+2,any reason why we are not using a named tuple here?,2017-06-04 22:50:14,thunterdb
+3,"It depends a little bit on whether we can settle on a shared set of fields for namedTransformers. If we can defining a type (for example a NamedTuple) is a good idea. Right now, `_buildTFGraphForName` added the `graph` field to the dict and does a pass through on the other fields. If fields can change a little from transformer to transformer, having a fixed type is harder and using a dict gives us a bit more flexibility, for example to pass through fields. I think the right choice will be more obvious once we've implemented a few supported models,",2017-06-05 19:00:27,MrBago
+4,I'd also like to get the ported over to scala. We'll need to take a little time to figure out what exactly PIL is doing here so we can re-create it.,2017-06-05 20:02:56,MrBago
+5,Can you please put a one-line comment explaining what is going on here?,2017-06-04 22:51:40,thunterdb
+6,"The original line seems to be the [most recommended from stackoverflow](https://stackoverflow.com/questions/59895/getting-the-source-directory-of-a-bash-script-from-within) to find the location of the script.
+",2017-06-05 18:33:59,phi-dbq
+7,Thanks!,2017-06-05 20:04:25,MrBago
+8,let's remove this TODO (for cleanliness),2017-06-05 21:58:37,sueann
+9,indent (and two lines below),2017-06-05 21:59:03,sueann
+10,I feel like spark context should be the first argument... I don't know why... spidey senses.,2017-06-05 22:02:37,sueann
+11,@rxin `SparkContext.getOrCreate()` is what we want here? ,2017-06-05 22:02:58,sueann
+12,"nit : ""miss match"" -> ""mismatch""",2017-06-05 22:03:42,sueann
+13,can we rename this function? i have no idea what it's doing from the name,2017-06-05 22:42:49,sueann
+14,"yes that works. This was like this for testing in python, but it is not required.",2017-06-06 00:23:03,thunterdb
+15,Should I add the Author list here?,2017-06-05 21:29:32,sueann
+16,I would put it before the building instruction. The first thing that people should read should be the sentence below.,2017-06-05 23:10:37,thunterdb
+17,How about `Deep Learning Pipelines () provides ... . This library is released by Databricks and ...`,2017-06-05 23:11:49,thunterdb
+18,people -> users?,2017-06-05 23:14:41,thunterdb
+19,is it what people call 'data-parallel' computing? I would put that because it is a popular term for folks.,2017-06-05 23:15:58,thunterdb
+20,How about we remove the sentence until we have the announcement?,2017-06-05 23:16:25,thunterdb
+21,How about just 'early release'?,2017-06-05 23:16:40,thunterdb
+22,spark 2.1.1? We had some issues with 2.1.0,2017-06-05 23:17:09,thunterdb
+23,"let's remove the SPARK_HOME, this is something that is said to be set already.",2017-06-05 23:17:40,thunterdb
+24,Is that true?,2017-06-05 23:17:50,thunterdb
+25,do the links work?,2017-06-05 23:19:14,thunterdb
+26,`tiong`,2017-06-05 23:20:21,thunterdb
+27,wiki link? https://en.wikipedia.org/wiki/Transfer_learning,2017-06-05 23:21:20,thunterdb
+28,"We should eventually have a demo dataset that is builtin, it would make things more easily",2017-06-05 23:22:04,thunterdb
+29,"I think ""data-parallel"" typically implies that the parameters are not distributed, and the parameters could be distributed in some forms of distributed training ?",2017-06-05 23:48:30,sueann
+30,We'll say we recommend Spark 2.1.1 and python 2.7... :-),2017-06-05 23:53:03,sueann
+31,😂😂😂,2017-06-05 23:53:29,sueann
+32,yep agreed.,2017-06-05 23:53:44,sueann
+33,this warning is not corect anymore,2017-06-06 00:06:31,thunterdb
+34,"this is all static. What is the advantage of wrapping stuff in a class? Is it pythonic?
+
+cc @MrBago ",2017-06-06 00:07:08,thunterdb
+35,put a TODO to make it configurable,2017-06-06 00:10:16,thunterdb
+36,"you need to put this file in `src/main/scala/org/tensorframes/impl`, this is the better convention",2017-06-06 00:16:07,thunterdb
+37,"note that I used here `logger.xxx` instead of `logXxx`, because it had issues in notebooks. But you can change that back.",2017-06-06 00:20:07,thunterdb
+38,Do we need to change it? If not we can keep it at the moment.,2017-06-06 01:49:38,phi-dbq
+39,"Can we consolidate op_name, tensor_name, strip_and_freeze_until with https://github.com/databricks/spark-deep-learning/blob/master/python/sparkdl/transformers/utils.py#L47-L71 ? Maybe move them out to something like python/sparkdl/tf_utils.py ?
+
+Do you think `GraphBuilder` can be used whenever we use `stripAndFreezeGraph` internally?
+It is probably still a good idea to separate out `strip_and_freeze_until` / `stripAndFreezeGraph` from it into a stand-alone function since `GraphBuilder` is probably too convoluted for the users of the package (vs internal usage).",2017-06-05 21:33:32,sueann
+40,I believe we can use it to replace all the TensorFlow session usage. ,2017-06-05 22:14:47,phi-dbq
+41,these are internal?,2017-06-05 23:41:47,sueann
+42,Please use `self.assertTrue` instead of `assert`.,2017-06-05 23:46:21,MrBago
+43,"The nested functions you define in this test are never run, did you mean to call them at the end of this method?",2017-06-05 23:46:51,MrBago
+44,Use `self.assertEqual`.,2017-06-05 23:48:05,MrBago
+45,"Yes. For the time being, it is best if they are only used by library and model maintainers. ",2017-06-06 01:18:15,phi-dbq
+46,"Sometimes it can be useful to create a namespace, but in this case I'd actually move it into it's own module. It should be cleaner that way. For example within the module you can drop the cls in statements like `cls._curr_sc()._jvm` and use `_curr_sc()._jvm`. You'll also get the benefits of a namespace, if you call the file `jvmapi.py` you'll use `jvmapi.for_class` and so on.",2017-06-06 02:47:03,MrBago
+47,this file should be put in `src/main/scala/org/apache/...`,2017-06-13 00:05:49,thunterdb
+48,"I think that this API is going to be part of the official API for Spark. Can you check with Reynold Xin, and put a comment to say when it is available? We should replace it eventually.",2017-06-13 00:06:45,thunterdb
+49,"These are used from Python, since `py4j` converts python lists to java lists",2017-06-14 18:00:19,phi-dbq
+50,We are using TensorFlow and TensorFrames compiled with Java 8. Thus using JDK8 here. ,2017-06-14 18:45:36,phi-dbq
+51,Only running scala tests for this PR. We will merge this file with the master travis file once this PR is checked in. ,2017-06-14 18:46:42,phi-dbq
+52,The comment should be updated here: I meant to say the TensorFrames factory.,2017-06-14 21:28:41,thunterdb
+53,camel case?,2017-06-14 21:29:10,thunterdb
+54,This comment is going to be lost. Mention in the doc of the class that all the public methods are expected to be reachable from python / py4j,2017-06-14 21:30:18,thunterdb
+55,doc?,2017-06-14 21:30:47,thunterdb
+56,Anyone is calling this function?,2017-06-15 04:53:08,gatorsmile
+57,"Since 2.x, we do not encourage users to use SQLContext. Instead, you can pass SparkSession.",2017-06-15 04:54:15,gatorsmile
+58,"as mentioned, it is better to keep all the interfaces between python and scala to simple things like `ArrayList`, this simplifies the maintenance.",2017-06-16 22:14:34,thunterdb
+59,This file is copied from graphframes.,2017-06-14 00:50:44,MrBago
+60,For python3 compatibility.,2017-06-14 00:51:07,MrBago
+61,python3,2017-06-14 00:51:16,MrBago
+62,Breaking this test up allows unused variables to go out of scope and be GCed.,2017-06-14 00:55:45,MrBago
+63,"We might need to add 
+```
+jdk:
+ - oraclejdk8 # openJDK crashes sometimes; tensorframes is compiled w.r.t JDK8
+```
+following TensorFrames Travis settings https://github.com/databricks/tensorframes/blob/master/.travis.yml",2017-06-14 23:44:24,phi-dbq
+64,camelCase,2017-06-20 02:16:27,sueann
+65,This is pretty much what's behind the SQL UDF.,2017-06-06 09:01:17,phi-dbq
+66,I feel like there were some comments about this (vs _java_api_sql)... but I can't find them. @MrBago / @thunterdb ?,2017-06-09 22:16:08,sueann
+67,absolute import seems more robust. cc @MrBago ,2017-06-09 22:18:21,sueann
+68,"this feels a bit overly complex. my biggest concern would be that for any new contributors who are used to tf.session / tf.graph, they would need to learn what `with GraphBuilderSession() as builder` translates to. e.g. it's taking me some time to understand and trust that this is going to serve all the needs in the transformer code.
+
+so let's make this match tf.Session and not return a builder in `__enter__`",2017-06-09 22:21:28,sueann
+69,nit: elements,2017-06-09 22:29:01,sueann
+70,"I'd make it `keras` instead of `wrap_keras`. It's simpler for the user to think about it as, ""if I'm using keras, just set this flag to True)",2017-06-09 22:34:33,sueann
+71,Also use `graph` instead of `g` to be consistent with `tf.Session()`,2017-06-09 22:37:12,sueann
+72,why do you need a new session here?,2017-06-09 22:56:48,sueann
+73,validated_output ? `valid_output` sounds like it should return a bool,2017-06-09 23:02:48,sueann
+74,`validated_input` ? `valid_input` sounds like it should return a bool,2017-06-09 23:03:01,sueann
+75,"i think it's clearer to make this a module of functions, since the functions are all basically static functions.
+
+the module's mission would be providing commonly-used graph pieces. good luck naming xD",2017-06-09 23:11:37,sueann
+76,UDF -> GraphFunction,2017-06-09 23:12:42,sueann
+77,"it might fit better in GraphFunction class itself, e.g. from_keras",2017-06-09 23:15:44,sueann
+78,`show` is a good enough name,2017-06-09 23:34:56,sueann
+79,move the tf.Session creation to GraphBuilderSession. when we need to use it in strip_and_... pass it in then. it's confusing to have a tf.session as a class variable and not use it in the class methods.,2017-06-09 23:37:18,sueann
+80,this one probably also belong elsewhere. let's move it to GraphFunction.fromList(),2017-06-09 23:40:42,sueann
+81,do not return the builder. return yourself.,2017-06-09 23:41:21,sueann
+82,"I think it'd be clearer to move this class out into its own module (not a class) and have the functions all take in `graph` as an arguement. This then essentially is a utils static class with only static functions, which is better for performance as well.",2017-06-09 23:45:44,sueann
+83,"`IsolatedSession` might be a good name to describe what it's doing. It should match what tf.Session is (including being able to get the graph from the session), but ensure isolation for tensorflow and keras sessions.",2017-06-10 00:18:27,sueann
+84,ok so this writes out a html file so that you can view the graph in your browser. it's awesome! let's rename it to write_visualization_html() and have it take in an optional filename ,2017-06-10 00:22:33,sueann
+85,I am moving this into a separate submodule.,2017-06-12 20:25:33,phi-dbq
+86,"oops ~
+",2017-06-12 20:25:49,phi-dbq
+87,I moved the utility functions into a separate module and combined the `tf.Session` like features into a single class. ,2017-06-12 23:20:21,phi-dbq
+88,"I combined the `tf.Session` like features of `GraphBuilder` and `GraphBuilderSession` into a single class named `IsolatedSession`. 
+",2017-06-12 23:21:07,phi-dbq
+89,"why not put it in python/sparkdl/graph/utils.py ? I think it's better to put specialized util modules in the relevant submodules vs putting all util modules in the same ""utils"" module.",2017-06-12 23:27:14,sueann
+90,why not use absolute imports? seems more robust. cc @MrBago ,2017-06-12 23:27:40,sueann
+91,is it too messy to put in GraphFunction as e.g. `from_graph_functions` ? it's a little out of place in this module.,2017-06-12 23:30:13,sueann
+92,"In this session, the new first graph function is reloaded with its own name scope (to avoid potential name conflict). In the previous session, we acquire the tensor info of the original inputs. In this session, the original inputs are reconstructed. 
+![screen shot 2017-06-09 at 3 37 04 pm](https://user-images.githubusercontent.com/28275034/27059766-1a6367b4-4f8d-11e7-8fce-c3f73d465a8c.png)
+",2017-06-12 23:32:56,phi-dbq
+93,also this import doesn't seem used?,2017-06-12 23:33:27,sueann
+94,"still woud like a better name for the module since ""factory"" sounds like https://en.wikipedia.org/wiki/Factory_method_pattern",2017-06-12 23:34:02,sueann
+95,pieces.py ?,2017-06-12 23:34:30,sueann
+96,"could we name this file builder.py and if needed do 
+```
+import sparkdl.graph.builder as graph_builder
+```
+?
+
+is there a convention @MrBago  ?",2017-06-12 23:35:15,sueann
+97,is this module basically meant to be exposed only through `utils.pyutils` below?  might want to add a comment. ,2017-06-12 23:36:40,sueann
+98,a little weird to have a module utils.utils,2017-06-12 23:36:58,sueann
+99,"much cleaner than my initial code, thank you.",2017-06-13 00:11:31,thunterdb
+100,"Can you explain a bit more how the data is stored? It is very specific joblib things. Also, you should change the name to make it more explicit, such as ""dumpTemporary"" or ""dumpInternal"" or something even more scary.",2017-06-13 00:13:14,thunterdb
+101,parameters?,2017-06-13 00:13:43,thunterdb
+102,doc?,2017-06-13 00:15:52,thunterdb
+103,doc?,2017-06-13 00:15:58,thunterdb
+104,The `pyutils` is the one from spark's [PythonUtils](https://github.com/apache/spark/blob/master/core/src/main/scala/org/apache/spark/api/python/PythonUtils.scala). ,2017-06-13 00:40:10,phi-dbq
+105,"Utilities defined in this module are supposed to run as if they were part of TensorFlow utilities, e.g.
+`import sparkdl.graph.utils as tfx`.  Thus I kept the names as snake_case.",2017-06-13 00:43:51,phi-dbq
+106,"we might want to decide a better serialized format, so the scala side can also load it easily",2017-06-13 00:52:09,phi-dbq
+107,"The model is supposed to look like this 
+![graph-function-from-list](https://user-images.githubusercontent.com/28275034/27061537-99313b82-4f99-11e7-9f55-d4127fbb2289.png)
+",2017-06-13 01:05:17,phi-dbq
+108,Why are we using joblib here? Couldn't we use json for this? It seems pretty heavy to add a joblib dependency just for serialization.,2017-06-13 17:43:42,MrBago
+109,What is `_st`? Could we use a better variable name?,2017-06-13 17:56:00,MrBago
+110,"This functions is a bit odd to reason about. Could you make two helper functions, one to handle the path case and one to handle the KarasModel. In the latter, you can use a try/finally block to control the tempdir creation/deletion and call the former function within the try.",2017-06-13 18:01:33,MrBago
+111,The name here is confusing because fromKeras can also take a file.,2017-06-13 18:14:20,MrBago
+112,What is the identity graph for? Is it for testing?,2017-06-13 18:16:35,MrBago
+113,Aren't lines 78-79 the same as lines 86-87?,2017-06-13 20:07:29,MrBago
+114,"Is there a reason you get ""x"" twice here?",2017-06-13 20:10:55,MrBago
+115,I renamed this to `fromSerialized`,2017-06-14 00:43:25,phi-dbq
+116,renamed as well,2017-06-14 00:43:33,phi-dbq
+117,looks like it was a copy-and-paste duplicate ~ removed,2017-06-14 01:22:38,phi-dbq
+118,This should be `six==1.10.0`.,2017-06-14 01:25:23,MrBago
+119,"I think pathlib is python3 only, can you check.",2017-06-14 01:26:00,MrBago
+120,Why aren't we using json here? Isn't serialized made up of strings and lists? json is much better for portability than pickle.,2017-06-14 01:30:02,MrBago
+121,If this is for testing can we move it into the test file.,2017-06-14 01:30:52,MrBago
+122,Travis found one more thing :). I think you meant to do `import sparkdl.utils.udf as udf` here because you use the module on L239. But that won't actually work because you're shadowing the udf from `pyspark.sql.functions` imported a few lines above. Maybe we should rename this module?,2017-06-14 01:58:32,MrBago
+123,oh well ~ that was subtle TT. Moving them back to JVMAPI ~ thanks man!,2017-06-14 07:20:06,phi-dbq
+124,"oic what the issue here is, even though the method is called `SerializeToString()` it returns a binary object ... that's lame. hmm ...
+
+I'm not sure the best way to handle this. We could pickle ... or use 2 files ... or base64 encode the blob ... I don't love any of those options :).
+
+Sorry for mouthing off without fully understanding the issue :p.",2017-06-14 18:03:06,MrBago
+125,They certainly have interesting ways to name things. Thanks for the suggestions. I think saving them for two files like this makes Scala Python model sharing easier. ,2017-06-14 19:04:30,phi-dbq
+126,"To make Travis happy, allocating executors according to the machine's capacity. ",2017-06-14 21:55:45,phi-dbq
+127,This method does not check the whether said tensor name exists in the graph. ,2017-06-14 21:56:59,phi-dbq
+128,To avoid overly being clogged by py4j output.,2017-06-14 21:58:14,phi-dbq
+129,"I think --nologcapture will really help. Can we avoid using --nocapture, nocapture allows us to put useful print statements in the tests which will only get reported if the test fails.",2017-06-15 00:01:46,MrBago
+130,Doesn't `os.path.join` return a str?,2017-06-15 00:08:28,MrBago
+131,I like to put everything between `mktemp` and `rmtree` in a try/finally :).,2017-06-15 00:08:58,MrBago
+132,`mkdtemp` should not be inside the try because we do not want to call `rmtree` if `mkdtemp` fails.,2017-06-15 01:30:47,MrBago
+133,"as mentioned in #15 , let's change that so that the python list is handlded directly by py4j.",2017-06-16 22:19:32,thunterdb
+134,we should not need that,2017-06-16 22:20:17,thunterdb
+135,this is a duplicate from some code in #15 ? ,2017-06-16 22:20:50,thunterdb
+136,Nice!,2017-06-16 22:21:10,thunterdb
+137,"If we do not do that, does it take so long that we get killed? We should make the tests run faster somehow.",2017-06-16 22:21:52,thunterdb
+138,can you also add a check that the graph of `tfobj_or_name` is `graph`?,2017-06-16 22:24:32,thunterdb
+139,"I actually changed this to explicitly store the `GraphDef` as bytes and the filename, inputs and outputs names in a JSON file. 
+https://github.com/databricks/spark-deep-learning/blob/1dda1ef8c9d7ff561ee9bc85cbcddf9e4095466b/python/sparkdl/graph/builder.py#L140",2017-06-16 22:30:55,phi-dbq
+140,"with a hard coded `local[4]`, travis get OOM for tests with inception graphs. ",2017-06-16 22:49:03,phi-dbq
+141,do you need this change?,2017-06-19 17:29:56,thunterdb
+142,new line?,2017-06-19 17:30:25,thunterdb
+143,do you still need it? It may cause some issues with the size of logs,2017-06-19 17:30:51,thunterdb
+144,"does it work? If not, remove it.
+
+Also, looking at the travis logs, I do not see tests running.",2017-06-19 17:33:44,thunterdb
+145,I would call it `prefix` instead of `name`,2017-06-19 17:35:08,thunterdb
+146,"This may not work with `name == None`, but this is fine.",2017-06-19 17:36:00,thunterdb
+147,you do not seem to use it?,2017-06-19 17:40:51,thunterdb
+148,you do not seem to use it?,2017-06-19 17:41:11,thunterdb
+149,"`keras` is not specific enough, I find, when reading the tests. How about `keras_use_tf`? ",2017-06-19 17:45:48,thunterdb
+150,"You only seem to define it and test it.
+ 
+My concern with this function is that we do not use it, and it adds a significant API liability (file API). Let's add a big warning in the doc that says that the file format is not stable, should not be trusted for long-term storage, is only for temporary operations with `dump` etc. And put the same comments in `dump`.
+
+We will most probably change the format anyway because of the cost of json serialization above, it is going to be much slower that one could do.",2017-06-19 17:48:47,thunterdb
+151,yes you do.,2017-06-19 17:49:12,thunterdb
+152,"does this function need to be an inner function? You could define it outside the class as a separate function, right?",2017-06-19 17:50:09,thunterdb
+153,doc please,2017-06-19 17:50:30,thunterdb
+154,This doc is not great. The main purpose of this class is to provide isolation of keras and tensorflow resources.,2017-06-19 17:51:20,thunterdb
+155,"all this code is pretty complicated. I trust you, which means that you also trust me, the original author :) Feel free to ask a second review from someone else, as I am fairly biased about this section.",2017-06-19 17:52:58,thunterdb
+156,"One other comment that should be added here: each of the function is scoped by the `scope name`, with the exception of the initial input and the final output.",2017-06-19 17:54:54,thunterdb
+157,you should state in English the invariant being checked here.,2017-06-19 17:55:25,thunterdb
+158,It is worth restating that the initial placeholders are not affected by the name rescoping.,2017-06-19 17:56:20,thunterdb
+159,You can leave as a TODO here that we import all the initial function instead of the input placeholders. This may cause some issue later if people reimport in the same graph some nodes with the same names.,2017-06-19 17:57:24,thunterdb
+160,"+1, thanks for the TODO",2017-06-19 17:58:03,thunterdb
+161,`img_dtype == SparkMode.RGB`,2017-06-19 17:58:34,thunterdb
+162,one line doc with what is being returned?,2017-06-19 18:00:02,thunterdb
+163,I am surprised we do not have this already.,2017-06-19 18:01:41,thunterdb
+164,Add this comment in the code,2017-06-19 18:01:58,thunterdb
+165,"`, name_parts`",2017-06-19 18:02:21,thunterdb
+166,"`, name_parts`",2017-06-19 18:02:29,thunterdb
+167,you should mention that it prunes out all the parts of the graph that are unreachable from the fetches.,2017-06-19 18:53:26,thunterdb
+168,this is very cool! I wonder if we should advertise it more. Certainly worth of its own PR.,2017-06-19 18:54:11,thunterdb
+169,"I am mainly following [tensorframes' travis file](https://github.com/databricks/tensorframes/blob/master/.travis.yml#L6). 
+Otherwise we get the minor version error as the tensorframes dependency we use is compiled against java 8",2017-06-19 19:16:20,phi-dbq
+170,"I am not quite certain whether it is due to `--nologcapture` or that plus this that suppressed the TensorFlow INFO logs. 
+
+For tests, I believe they did run
+https://travis-ci.org/databricks/spark-deep-learning#L1099",2017-06-19 19:25:21,phi-dbq
+171,"Per https://www.tensorflow.org/api_docs/python/tf/import_graph_def, passing `None` is the default of `tf.import_graph_def` and it will add the prefix ""import"" to the graph.",2017-06-19 20:34:58,phi-dbq
+172,Oh?,2017-06-19 21:43:30,phi-dbq
+173,"Thanks :) 
+I am removing this and putting it to a separate PR.",2017-06-19 21:44:13,phi-dbq
+174,"This is pretty frustrating. There is a separate PR for this, https://github.com/databricks/spark-deep-learning/pull/20. Adding travis related stuff to your PR not only introduces merge conflicts, which then take time to resolve. It also makes your PR harder to review and we end up having the same conversations twice.
+
+Can we commit to these conditions for merging this PR. 1) Fix failing tests in master 2) Merge travis PR 3) rebase on master, then we can properly merge this PR.",2017-06-19 22:00:23,MrBago
+175,`using_keras` ? not sure what `keras_use_tf` means either??,2017-06-20 01:55:07,sueann
+176,"or as a ""private"" function inside the class until we want it exposed",2017-06-20 01:56:27,sueann
+177,unused?,2017-06-20 02:02:58,sueann
+178,no longer true,2017-06-20 02:03:33,sueann
+179,"there is no longer a class called GraphBuilder, so rename to... `GraphFunctionWithIsolatedSessionTest` ?
+
+several of the tests are testing GraphFunction and nearly all are testing IsolatedSession. It'd be ideal to separate them out, e.g. testing GraphFunction functions should use tf.Session. But the test coverage looks good enough so I'd add a TODO comment for this and call it a day for this PR (it's been modified enough...)
+",2017-06-20 02:03:58,sueann
+180,"` assert len(name_parts) <= 2, name_parts` to print what is wrong when the assert gets triggered",2017-06-20 18:16:48,thunterdb
+181,"You should do that for any assert, otherwise it is unhelpful.",2017-06-20 18:17:06,thunterdb
+182,"indeed, they did.",2017-06-20 18:22:46,thunterdb
+183,"@phi-dbq you just removed the python tests, see the travis exit...",2017-06-20 18:24:52,thunterdb
+184,"it does, indeed.",2017-06-20 18:25:06,thunterdb
+185,`tfs` is more customary,2017-06-20 21:36:50,thunterdb
+186,`fetch`,2017-06-20 21:39:59,thunterdb
+187,"you need to expand this comment. I understand what you mean, but no one else probably does.",2017-06-20 21:42:57,thunterdb
+188,"We should really move that to tensorframes, it calls all sorts of internal functions.",2017-06-20 21:46:17,thunterdb
+189,put private functions lower. A file should be structured from the most important to the least important.,2017-06-20 21:46:55,thunterdb
+190,"Man, this function is going to be so slow: python UDF, converting to PNG, writing to disk, etc.",2017-06-20 21:48:01,thunterdb
+191,You should make it clear that this is a perf bottleneck.,2017-06-20 21:48:27,thunterdb
+192,is this true?,2017-06-20 22:16:50,thunterdb
+193,why upper case?,2017-06-20 22:17:58,thunterdb
+194,... as a whole column,2017-06-20 22:19:53,thunterdb
+195,"this is all repeated between tests, do not copy.",2017-06-20 22:21:01,thunterdb
+196,"I am confused, what is the difference with the file above?",2017-06-20 22:21:42,thunterdb
+197,"this return value is very unhelpful for python users, but I want to propose a way to wrap a scala UDF automatically. No need to change it for now.
+
+Update the doc though to mention that it is of class `... UserDefinedFunction`",2017-06-20 22:24:13,thunterdb
+198,"In retrospect, I am not a fan for calling `forClass` because it also sets the default the sql context. Something like `createBuilder` is good, I think.",2017-06-20 22:27:29,thunterdb
+199,"This is the main function of this file, and it should be well documented. You should use here the pydoc syntax. Ideally, this should be a standalone docstring test, but that requires a bit of setup. You should explain at least how to get a H5 file (or point to the keras doc).
+
+Also, the main usage will probably be a python object, not a file. You can put something simple like what is here: https://keras.io/getting-started/sequential-model-guide/
+
+```
+model = Sequential()
+model.add(Dense(32, input_dim=784))
+```",2017-06-20 22:31:06,thunterdb
+200,"the name of the SQL function, once it is registered. If the name exists, it will be overwritten.",2017-06-20 22:31:50,thunterdb
+201,do we just accept file paths? I thought we were also accepting models. I recall that there are some serialization issues to consider for that?,2017-06-20 22:32:32,thunterdb
+202,this is not correct?,2017-06-20 22:32:47,thunterdb
+203,"you should explain what this is, and where it comes from. There should be an example above with inception, so that people understand the necessity. This is just a matter of copy/pasting one of the tests.",2017-06-20 22:33:45,thunterdb
+204,I did not know you could chain variables like this.,2017-06-20 22:36:38,thunterdb
+205,"Oh, my bad ~ it is a merge mistake",2017-06-20 23:03:40,phi-dbq
+206,"Is this a comment suggesting action for this PR, or a comment to leave a comment here? 😅",2017-06-20 23:38:09,sueann
+207,not sure if there is a description that will be clear enough lol. do we actually support blocking for these UDFs?,2017-06-20 23:39:15,sueann
+208,"actually, what does it mean to have blocking for a SQL UDF?",2017-06-20 23:40:22,sueann
+209,"More like ""Returns a function that loads and preprocesses images using the given preprocessor  (image_file_path => image_tensor).
+
+",2017-06-20 23:46:44,sueann
+210,Also specify what the input and output of the preprocessor should be (file path string => numpy array),2017-06-20 23:51:33,sueann
+211,Also need to say what the input and output column types for the resulting UDF are. ,2017-06-20 23:52:22,sueann
+212,"one potential optimization:
+For this use case where the input dataframe to the SQL UDF contains file paths, instead of having to register a pipeline of load => predict, we could have a version of registerKerasUDF that natively handles file path input columns. This way we could avoid doing:
+file path => load file => write file => load file using the given preprocessor => predict. ",2017-06-20 23:57:29,sueann
+213,"if that sounds interesting, let's talk in person a little before doing it",2017-06-20 23:57:56,sueann
+214,This blank line is needed or sphinx won't parse the lists correctly,2017-06-21 01:31:58,phi-dbq
+215,"here is how to make the code testable:
+https://thomas-cokelaer.info/tutorials/sphinx/doctest.html",2017-06-21 20:37:12,thunterdb
+216,do you need to isolate?,2017-06-21 20:37:27,thunterdb
+217,just put one dense layer for the purpose of example,2017-06-21 20:37:44,thunterdb
+218,"hmm ok, we use it after that",2017-06-21 20:38:38,thunterdb
+219,is it required?,2017-06-21 20:38:46,thunterdb
+220,can you directly get the name from the layer? It should be something simple?,2017-06-21 20:39:15,thunterdb
+221,import also the preprocessor,2017-06-21 20:40:41,thunterdb
+222,this is the most common use case.,2017-06-21 20:40:52,thunterdb
+223,"I had forgotten that this is just for tensorflow. The example here should be minimal, like the test below:
+
+```python
+		 +        with IsolatedSession() as issn:
+ +            # The placeholder that corresponds to column 'x' as a whole column
+ +            x = tf.placeholder(tf.double, shape=[], name=""x"")
+ +            # The output that adds 3 to x
+ +            z = tf.add(x, 3, name='z')
+ +            # Let's register these computations in SQL.
+ +            issn.asUDF(""map_rows_sql_1"", [z])
+```
+",2017-06-21 20:42:51,thunterdb
+224,actually see comment above.,2017-06-21 20:45:25,thunterdb
+225,see comment above about this example,2017-06-21 20:45:41,thunterdb
+226,see comment above about this example,2017-06-21 20:45:46,thunterdb
+227,"I had missed that before: this function does not use a full session, just the current graph of computation. Instead of making it a method to the isolated session, make it a top-level function with the first argument being a graph. This function is meant to be low level, and I want to move it to TensorFrames eventually.",2017-06-21 20:46:36,thunterdb
+228,Our code examples require setting up spark and tensorflow/keras for testing. Maybe we can provide them as examples and import them in the doc? ,2017-06-21 21:49:15,phi-dbq
+229,Looks like we have to explicitly call `model.build()` to have the `model.input_names` available. https://github.com/fchollet/keras/blob/master/keras/models.py#L535,2017-06-21 21:52:11,phi-dbq
+230,Let's just put it in the README.md and the databricks guide.,2017-06-21 22:03:26,sueann
+231,Why is this under graph/ and the keras one under udf/ ? Is this one not meant to be exposed?,2017-06-21 23:17:22,sueann
+232,why would you ever have it not blocked? should we just make it always blocked and remove the argument?,2017-06-21 23:18:37,sueann
+233,function -> UDF,2017-06-21 23:19:48,sueann
+234,"nit: produce -> produces
+
+the output is any arbitrary vector right? doesn't have to be a probability vector. I forget if the return type is a list or a MLlib Vector, but should specify here.",2017-06-21 23:19:59,sueann
+235,"Good point, I have also forgotten.",2017-06-22 00:21:12,thunterdb
+236,"do we want to expose it here? I would prefer to keep it private-ish for the time being, because this should belong to TensorFrames: it calls all sorts of internals and it is not specific to deep learning.",2017-06-22 00:22:13,thunterdb
+237,we should add that in a comment here then. Maybe rename the module to `tensorframes_udf` if we really want this to be in tensorframes eventually. `spark_utils` sounds like it's got a bunch of helper functions around spark.,2017-06-22 00:25:53,sueann
+238,I intend to consider things under graph/ as more like developer tools whereas things under udf/ are baked UDFs that end users can use.,2017-06-22 00:31:09,phi-dbq
+239,"from @thunterdb : two scenarios under which you would use blocked = False:
+1/ your tensorflow graph tensors do not specify the ""batch"" dimension (the first dimension in the shape)
+2/ rows have varying sizes, e.g. sparse vectors
+
+let's document this here.",2017-06-22 00:33:20,sueann
+240,"If `blocked = true`, the graph provided by the user should [accept batch input](https://github.com/databricks/spark-deep-learning/blob/master/src/main/scala/org/tensorframes/impl/SqlOps.scala#L116), e.g. `input_shape=(None, W, H, C)`. Our current `Spimage` allows images to have different width and heights, thus batching might not be able to directly apply. ",2017-06-22 00:39:07,phi-dbq
+241,"Yeah, I think the output is just an arbitrary vector (`WrappedArray`). ",2017-06-22 00:44:09,phi-dbq
+242,"Ah yeah, for the Keras udf registration functinon we do need to talk about `SpImage`. It might fail if the images have different widths and heights, but it could succeed if they all had the same widths and heights right? ",2017-06-22 01:08:58,sueann
+243,this also can output an arbitrary vector no?,2017-06-22 01:10:34,sueann
+244,"by that i mean the ""categories"" part is not necessary. for example, the input model may not actually output a classification probability vector but a transformed image, no? In such a case, the UDF returns a flat vector, not a `SpImage`, right? (For KerasImageFileTransformer, there is an option to return a SpImage or a 1-d vector).",2017-06-22 01:13:27,sueann
+245,"Yes, you are right. The model dictates the output.",2017-06-22 01:29:33,phi-dbq
+246,"Yes. To apply a vanilla Keras Inception model, the width and height have to be fixed. For any popular image mode, the input is expected to be of a fixed size, unless reshaping to canonical size from provided width and height is part of the model graph, like we have in the transformers. ",2017-06-22 03:56:17,phi-dbq
+247,+1 for renaming to `tensorframes_udf`,2017-06-22 17:00:19,thunterdb
+248,"I will need to document this part, but TensorFrames expects a first analysis pass that adds some metadata with the shape info in order to work correctly with blocks. It does not matter in the case of simple inputs like scalars. I want to make the input of tensorframes more robust to mis-shaped batches, but I am waiting to see the sort of use cases that people come up with before making changes here.",2017-06-22 17:05:08,thunterdb
+249,"Keep a high-level, 1- or 2-sentence description at the top. Readers must understand immediately what this project is about.",2017-06-26 21:45:42,thunterdb
+250,"Do not put `Content` as a top level, it is a single bullet.",2017-06-26 21:46:02,thunterdb
+251,I thought it was automatically generated from the markdown. Try without it?,2017-06-26 21:46:36,thunterdb
+252,Overview,2017-06-26 21:47:07,thunterdb
+253,`Databricks`,2017-06-26 21:47:24,thunterdb
+254,link?,2017-06-26 21:51:15,thunterdb
+255,The list failed here,2017-06-26 21:52:48,thunterdb
+256,"Might as well update with our first release info for 0.1.0.
+
+We could also release 0.1.1 (0.2.0?) now that the UDF creation function is in.",2017-06-26 22:19:30,sueann
+257,"Oh, it should have been just a highlight. ",2017-06-27 20:13:48,phi-dbq
+258,"I was porting this from org-mode, but now I found out that Emacs has a pretty good markdown mode, so I switched to directly updating the .md file.",2017-06-27 20:14:54,phi-dbq
+259,nit: remove `:`,2017-06-27 22:52:23,sueann
+260,"Let's make this ""Maintainers"" instead of ""Authors"". Saw that somewhere and it felt nicer.",2017-06-27 22:52:58,sueann
+261,"can you add: ""Be sure to run `build/sbt assembly` before running the Python tests."" ?",2017-06-27 22:53:53,sueann
+262,"Let's add some more context:
+
+""One way to productionize a model is to deploy it as a Spark SQL function, which allows anyone who knows SQL to use it. Deep Learning Pipelines provides mechanisms to take a deep learning model and register a Spark SQL user-defined function (UDF). """,2017-06-27 22:56:26,sueann
+263,"""The resulting UDF ...""",2017-06-27 22:56:35,sueann
+264,"The second ""are"" is not needed",2017-06-27 22:57:18,sueann
+265,Add an example of what the SQL user's query would be like.,2017-06-27 22:58:33,sueann
+266,"nit: ""a column a"" -> ""a column""",2017-07-05 20:58:52,sueann
+267,we don't need ResNet50 here yet -- will clean up,2017-07-05 17:26:24,sueann
+268,"I wonder since we are passing the model, can we also use `model.input.shape` to get the shape?",2017-07-05 17:55:46,phi-dbq
+269,"We should probably add a documentation that Keras uses the default session/graph, so the `sess.as_default` will attach the model to the session we are using. ",2017-07-05 18:05:54,phi-dbq
+270,`KerasApplicationModelSession `?,2017-07-05 18:09:05,phi-dbq
+271,"Will this create a new `InceptionV3` model every time we call this function? 
+Shall we also pass the weights argument (or not since keras by default uses ""imagenet"")",2017-07-05 18:11:59,phi-dbq
+272,I don't think we need to comment on it since that is the default behavior of keras. ,2017-07-05 21:26:32,sueann
+273,Ah I renamed the class. Will fix the comment.,2017-07-05 21:26:42,sueann
+274,"It will, but in the tests we don't instantiate it more than once. We can cache stuff in the class if it becomes useful. I agree it's clearer to add ""imagenet"" for weights though.",2017-07-05 21:27:46,sueann
+275,"doesn't seem to work... `ValueError: New image size should have for [hight, width] but got (?, ?, ?, 3)`",2017-07-05 22:41:54,sueann
+276,The coverage report complains if the `sparkdl` package is not imported.,2017-07-10 19:56:49,phi-dbq
+277,"We can use a dictionary for `KERAS_APPLICATION_MODELS`, something like:
+```
+KERAS_APPLICATION_MODELS = {""ResNet50"": ResNet50Model,
+...
+}
+```
+
+that way this block becomes:
+
+```
+try:
+    return KERAS_APPLICATION_MODELS[name]()
+except KeyError:
+   raise ValueError(...)
+```
+.",2017-07-10 17:17:55,MrBago
+278,"How do you feel about making these test methods ""private""? I think we should make it clear they are not part of the public API.",2017-07-10 17:28:06,MrBago
+279,will clean this up,2017-07-10 21:00:07,sueann
+280,Hm... but then they are not private anyway because of how they are called in tests... ?? Is it weird to make it look private and use it outside the class?,2017-07-10 21:01:52,sueann
+281,Should this be `str(KERAS_APPLICATION_MODELS.keys())`?,2017-07-10 22:55:09,MrBago
+282,"or maybe even, `"", "".join(KERAS_APPLICATION_MODELS.keys())`.",2017-07-10 22:58:28,MrBago
+283,ah yes. clearly not in a test path......,2017-07-10 22:59:05,sueann
+284,unused import: `decode_predictions`,2017-07-11 16:51:56,phi-dbq
+285,`keras_app.KERAS_APPLICATION_MODELS`?,2017-07-11 17:05:22,phi-dbq
+286,"Some version of this will go into test and docs. 
+Just put them here to show how it is being used.",2017-07-11 07:04:24,phi-dbq
+287,"Probably not the most ideal way to convert RGBA or YCbCr or LA into RGB. 
+We could address that later on in `imageIO` improvements.",2017-07-11 07:05:55,phi-dbq
+288,"Features might fail to load due to various resource acquisition errors. 
+Thus we must get features and their labels together.",2017-07-11 07:08:22,phi-dbq
+289,These are for local REPL based development ~ they will be moved to utility files.,2017-07-11 20:41:18,phi-dbq
+290,"This is the wrong header.  I think it was my bad introducing this incorrect header in the style/doc files.  (You're using the right one in the __init__.py file above.)  Could you please fix this, and send a different PR which fixes the other ones?  (Look for ""foundation"" to find those incorrect headers.)",2017-07-13 18:11:25,jkbradley
+291,style: sort imports within a group alphabetically,2017-07-13 18:11:52,jkbradley
+292,Can we reuse this with KerasImageFileTransformer?,2017-07-13 18:18:08,jkbradley
+293,"@sueann  Do we document these special column names?  In the future, it'd be nice to generate new names in a robust way.",2017-07-13 18:18:26,jkbradley
+294,"I think you can index row objects, eg `row[tmp_image_col]`.",2017-07-13 18:19:48,MrBago
+295,"If some of these are exactly the same for this and KerasImageFileTransformer, then it'd be nice to abstract them into shared abstract classes (1 for each Param) to ensure consistency.  E.g., this file does not have a typeConverter for outputMode, but KerasImageFileTransformer.",2017-07-13 18:20:35,jkbradley
+296,"Let's not use print for this. You can use `warnings.warn` but in this case maybe do something like:
+```
+try:
+  X = np.stack(localFeatures, axis=0)
+excpet SomeError as e:
+  raise ValueError(""images must all be the same size"")",2017-07-13 18:21:01,MrBago
+297,What is this print statement? Is this for the user or is it some kind of logging?,2017-07-13 18:23:04,MrBago
+298,same,2017-07-13 18:23:10,MrBago
+299,This error message is a note to developers.  Change it to something users will be able to understand in case we made a mistake and it gets thrown somehow.,2017-07-13 18:24:04,jkbradley
+300,"Let's go ahead and do this in this PR (below, just before calling _fitInParallel)",2017-07-13 18:25:29,jkbradley
+301,eliminate unused imports,2017-07-13 20:26:55,jkbradley
+302,style: Why is this enclosed in parentheses?,2017-07-13 20:28:21,jkbradley
+303,"Btw, we generally pass named arguments to constructors in Python, rather than using setters; either is Ok though",2017-07-13 20:29:25,jkbradley
+304,"Since this path is expected in the other test, how about putting this set up in outer setUpClass/tearDownClass methods (but be sure to call the parent setup/teardown methods).",2017-07-13 20:32:40,jkbradley
+305,Got it,2017-07-19 21:59:52,phi-dbq
+306,"`KerasImageFileTransformer` and `TFImageTransformer` require a trained Keras/TensorFlow model. 
+Here though we only do image decoding (which might not actually use TensorFlow). 
+I am thinking about using it as a common ABC and let the image transformers/estimators extend it.",2017-07-20 00:17:27,phi-dbq
+307,"Indeed, it might be better to have some randomness in the name to avoid potential conflict.",2017-07-20 00:19:09,phi-dbq
+308,is it our style?,2017-08-01 20:34:56,thunterdb
+309,(regarding the indentation),2017-08-01 20:50:49,thunterdb
+310,"remove all the print statements. Also, they would not work with python 2.6",2017-08-01 20:52:05,thunterdb
+311,"put a `__all__ = ['KerasImageFileEstimator']`, otherwise the logger will be exported too.",2017-08-01 20:53:05,thunterdb
+312,Add a reference to the Keras documentation (link).,2017-08-01 20:53:53,thunterdb
+313,Same thing here.,2017-08-01 20:54:01,thunterdb
+314,@MrBago do you have some style recommendations for absolute vs relative imports? I think google has some guidelines but I am not sure what is best.,2017-08-01 20:55:58,thunterdb
+315,definitely big data happening here...,2017-08-01 20:56:48,thunterdb
+316,can you also check the class type of the transformer?,2017-08-01 20:57:17,thunterdb
+317,this could be private too,2017-08-01 20:58:16,thunterdb
+318,this could be private,2017-08-01 20:58:30,thunterdb
+319,"`__all__ = ['model_to_bytes', ...]`",2017-08-01 20:58:52,thunterdb
+320,documentation please,2017-08-01 20:59:44,thunterdb
+321,"this is not really private but protected. I would rather name it without a `_` and mention in the doc that is internal, or call it `loadImagesInternal`",2017-08-01 21:04:05,thunterdb
+322,"this trait is not useful as it stands for users, as the implementation of the loader `_load_image_from_uri` is only in the test. How do you see users using it? We have to provide a default value for images.",2017-08-01 21:22:11,thunterdb
+323,unused,2017-08-01 21:23:37,thunterdb
+324,remove,2017-08-01 21:23:59,thunterdb
+325,"This API is not great because it returns a list of all the evaluated models. If you look at the other meta estimators in MLlib, they return the best one. Since the model evaluation is currently embedded in Keras (and outside the reach of Spark for now), this compromise is acceptable, but we will need to figure out how to make it return the best model eventually. Can you put a comment saying that this return value is subject to change in the future?
+
+cc @jkbradley who may have some thoughts on this point.",2017-08-01 21:29:41,thunterdb
+326,"This is an impressive 2-liner, but please use list comprehensions for readability. Note that you can distribute the array construct. It does not matter too much though as this is something we are probably going to move to the scala side.",2017-08-01 21:31:19,thunterdb
+327,"for usability, we should have a `setModel` that takes a Keras model and does all the file writing. This is how most users will want to interact with it. Can you add a TODO for the future?",2017-08-01 21:34:12,thunterdb
+328,@MrBago any thoughts?,2017-08-02 17:42:12,phi-dbq
+329,The user will provide an image loading function. This has been the assumption throughout the project. ,2017-08-03 16:45:24,phi-dbq
+330,"You can consolidate these, `from __future__ import division, absolute_import, print_function`.",2017-08-10 00:14:40,MrBago
+331,"I'm not sure what our style guidelines are here, but I prefer `import sparkdl.utils.keras_model as km` over `from sparkdl.utils.keras_model import *`. Then you'll need to use `km.thing` instead of `thing` in the code. This has been encouraged in other python projects I've worked on.",2017-08-10 00:16:20,MrBago
+332,Do we need this warning? Won't we raise an error if the images are different sizes?,2017-08-10 00:22:13,MrBago
+333,"I think you can index rows directly in pyspark, `row[tmp_image_col]`.",2017-08-10 00:23:34,MrBago
+334,Shouldn't this be `row[label_col]`?,2017-08-10 00:27:33,MrBago
+335,"Lets merge the two loops that that make these lists and drop this check, as discussed offline.",2017-08-10 00:47:22,MrBago
+336,What is this 1000? Where does it come from?,2017-08-10 00:48:14,MrBago
+337,"The use of `stack` and `shape` is confusing here because it makes it seem like `y_category` is multidimensional. Could we do something like:
+
+```
+localLabel = np.asarray(localLabel)
+batch_size = len(localLabel)
+```",2017-08-10 01:15:17,MrBago
+338,"It's a bit weird to build the estimator and `model_filename` and setUp but not write out the actual model until we're inside the test. If other tests wanted to use this estimator, they'd have to delete this file and replace it.
+
+Why don't we put the estimator creation inside the test for now, we can promote it to setup if we write other tests that need it.",2017-08-10 01:44:35,MrBago
+339,`self.assertEqual` is a little more informative than `assertTrue` when it fails.,2017-08-10 18:23:22,MrBago
+340,"The `label` column is expected to be numerical. The training data might not have all the label presented, so we also opt for users to provide a `cardinarlity` parameter. Most Keras models expect one-hot encoded labels. If the input labels are not in that format, we convert it.",2017-08-11 00:08:28,phi-dbq
+341,It was the default imagenet number of class labels. Removed it.,2017-08-11 00:52:31,phi-dbq
+342,It looks like `numpy.stack` takes care of that. I thus removed the warning.,2017-08-11 00:53:48,phi-dbq
+343,"Removed that, too",2017-08-11 00:54:21,phi-dbq
+344,"We ignore `inputImageNodeName`, `outputImageNodeName` and `outputMode` in the reference implementation. Keras input models (sequential or functional) have input and output fields. 
+The `kerasModel.fit` interface does not need these extra parameters. ",2017-09-01 23:36:45,phi-dbq
+345,"This is python, the land of no types and no useful signatures. This should be an enormous doc string with examples, details over parameters, etc.",2017-09-05 21:13:31,thunterdb
+346,see comment below in _validateParam. This converter should be also where we check for the correctness of the content.,2017-09-05 21:13:34,thunterdb
+347,"It is annoying that we have all this machinery of setters and getters, and that we have no way of ensuring that the loss value is not set to a proper value in the setter.  This check should be done above.",2017-09-05 21:14:13,thunterdb
+348,See comment about the loss.,2017-09-05 21:14:25,thunterdb
+349,Discussed offline with @jkbradley and @thunterdb. ,2017-09-06 00:32:30,phi-dbq
+350,done,2017-09-06 16:52:40,phi-dbq
+351,"This will serialize the entire `self` object, if we need most of `self` to call `_local_fit` that's not a big deal. Is that the case?",2017-09-06 20:39:42,MrBago
+352,I don't think you need this. A class will inherit its parent's methods.,2017-09-06 21:19:33,MrBago
+353,Same as above.,2017-09-06 21:19:42,MrBago
+354,same,2017-09-06 21:19:55,MrBago
+355,same,2017-09-06 21:20:05,MrBago
+356,Haven't thought much about them as the MLlib params are created from a script (and these are created along the way). I will remove them.,2017-09-06 22:00:25,phi-dbq
+357,That's a good question. Each individual task will create a `Transformer` which copies the entire set of parameters from `self`. ,2017-09-06 23:32:36,phi-dbq
+358,changed: line width >= 100,2017-09-07 01:44:42,phi-dbq
+359,changed: line width >= 100,2017-09-07 01:44:49,phi-dbq
+360,"Nit: move this function before all the private ones, to put all the public pictures together.",2017-09-08 00:22:43,thunterdb
+361,also add the shapes in the string to give debug info,2017-09-08 00:28:25,thunterdb
+362,"this will be cleaner if you do it this way:
+
+```
+rows = image_df.collect()
+... build X ...
+if label_col is not None:
+   ... build y ...
+```",2017-09-08 00:32:02,thunterdb
+363,"that may totally blow up, but I guess this is ok for now...",2017-09-08 00:33:20,thunterdb
+364,this comment does not correspond to what the function is doing,2017-09-08 00:36:07,thunterdb
+365,`maintainers`,2017-09-08 00:38:54,thunterdb
+366,else?,2017-09-08 00:41:39,thunterdb
+367,we will need to change `HasKerasModel` eventually: storing the name of a file is not enough for import/export. No need to change in this PR though.,2017-09-08 00:44:57,thunterdb
+368,Added warning in `.fit` function (docs are only shown in public functions).,2017-09-14 06:13:38,phi-dbq
+369,moved them to type converters,2017-09-14 17:06:38,phi-dbq
+370,moved to type convertes,2017-09-14 17:07:24,phi-dbq
+371,moved to type converters,2017-09-14 17:07:43,phi-dbq
+372,~way too~,2017-09-15 17:21:01,thunterdb
+373,The intention is to provide this as the Transformer API and provide utilities to convert any TensorFlow/Keras graph (or checkpoints) into a `GraphFunction` object. ,2017-08-08 21:35:07,phi-dbq
+374,"`GraphFunction` and `IsolatedSession` were added as internal classes not to be  exposed to users, only to be used within the internals of sparkdl, so we shouldn't have `GraphFunction` be a param user defines. These are foreign concepts to TensorFlow users. We should stick with what users know as much as possible so that this functionality is as easy for them to use as possible. Making this API match the one TFoS guys are building (https://github.com/yahoo/TensorFlowOnSpark/pull/114/files) would be better. If you think the proposed API in https://github.com/yahoo/TensorFlowOnSpark/pull/114/files is not as good, we should discuss.",2017-08-09 18:14:05,sueann
+375,you can do a rename for the column instead,2017-08-09 18:14:39,sueann
+376,"We may not need all the params the other API has, but if that is the case, we should have this API start with params that are a strict subset of the other API.",2017-08-09 18:19:11,sueann
+377,"Directly importing `tf.GraphDef` without the input tensor mapping is not working.
+Thus the user either provides a `TensorFlow Graph` or provide a `GraphFunction` (for developers). ",2017-08-10 00:33:03,phi-dbq
+378,"hasInputCol is not TensorFlow specific. in fact, it was copied from pyspark...!",2017-08-10 19:19:49,sueann
+379,it's not much code -- why not just put it in the transformer and skip having to convert from/to GraphFunction? also can keep using the IsolatedSession there then.,2017-08-10 19:26:30,sueann
+380,I'd just name it TFTransformer or TFModel. We can add to the doc that it only supports 1-d arrays currently.,2017-08-10 19:27:31,sueann
+381,what does this test? it seems like the difference between this and test_simple() is that this one uses GraphFunction and IsolatedSession? I don't think that test belongs in this class (and the functionality should have been tested in the Suites for GraphFunction/IsolatedSession anyway).,2017-08-10 19:32:04,sueann
+382,"Normally, we need to handle multiple 1+ input tensors. See TensorFlow Serving as a reference.",2017-08-11 00:15:27,anfeng
+383,We need to handle multiple input colmns.,2017-08-11 00:17:45,anfeng
+384,Also for output columns,2017-08-11 00:34:39,anfeng
+385,Also for output tensors. See https://github.com/tensorflow/serving/blob/master/tensorflow_serving/example/mnist_saved_model.py#L109-L114,2017-08-11 00:35:29,anfeng
+386,I am wondering if we want the tensors to be in separate columns or in fields of a nested column?,2017-08-11 01:03:13,phi-dbq
+387,TFTensorTransformer is redundant since it spells out to be TensorFlowTensorTransformer. Why not just TFTransformer or TFModel?,2017-08-11 23:15:47,sueann
+388,"Lines 83-33: why do you need to create a GraphFunction and then importGraphFunction to get fetches vs just using the fetches from above? 
+
+Somewhat related: `analyzed_df = tfs.analyze(df)` (line 85) doesn't have to be called right there, right? Could be called before the first `IsolatedSession` here?",2017-08-11 23:19:14,sueann
+389,The use of two sessions is due to the fact that exporting to `GraphFunction` modifies the graph and it has to be imported in another session. ,2017-08-11 23:26:09,phi-dbq
+390,oh i see... if we just need strip_and_freeze we should just call that here directly because this is hiding the fact that that is what (and all) we are doing.,2017-08-11 23:50:30,sueann
+391,It also seems that importing graph_def directly is a bit flaky. `importGraphFunction` attaches the names and tensors correctly. It might just save us a few lines of code.,2017-08-12 00:03:30,phi-dbq
+392,We can either provide names or tensors for the mappings,2017-08-12 00:16:36,phi-dbq
+393,We have to export this checkpoint as `GraphFunction` in the same session where it is restored. Since the variables are only initialized in this session. ,2017-08-12 03:11:20,phi-dbq
+394,Also it seems that we have to import the `meta_graph` first or there won't be any graph in this session (tried with either `IsolatedSession` or standard `tf.Session`).,2017-08-12 03:15:00,phi-dbq
+395,"Save the model and record the current `global_step`. Then we'd expect files like these.
+```
+model.ckpt-2702.index
+model.ckpt-2702.meta
+model.ckpt-2702.data-00000-of-00001
+```",2017-08-14 16:54:33,phi-dbq
+396,"this may not always work because there may be conflicts with existing columns, but this is rare enough I think that we do not need to handle it currently.",2017-08-17 20:34:02,thunterdb
+397,"This class is too complicated: I do not understand what is inside that parameter (actually, I do, but I had to reverse-engineer the logic to figure this out). Here is what we should do: store a `Seq[(String, String)]` for that parameter so that the order is clear, and only strings. Right now, you accept all sorts of objects such as tensors, which makes it hard to reason about. Most important, document that what each element means in the document. At least as a code comment.
+
+The reason for doing that is that you convert to primitive types, and that the type of the param is much more clear.",2017-08-17 20:38:37,thunterdb
+398,"Here, instead of being as simple, do some conversions: dicts should be converted to lists, sorted by key order; tensors should be converted to the string names, etc.",2017-08-17 20:38:40,thunterdb
+399,Says what it returns (list of tensor name -> output name),2017-08-17 20:39:16,thunterdb
+400,"It would be nice to check that the tensors are part of the graph, but this is probably too fancy given the code structure.",2017-08-17 20:40:02,thunterdb
+401,"based on my comment below, you do not need that function. It can be written just in a few lines during the conversion.",2017-08-17 20:40:29,thunterdb
+402,"you do not need this separate function at all, based on my quick analysis. Just one is enough.",2017-08-17 20:41:19,thunterdb
+403,"Also, instead of making something static and publick, just make a small helper funciton that is not exported.",2017-08-17 20:41:43,thunterdb
+404,"Let's not have such a function.
+
+Here is what you are currently doing:
+ - checking that something belongs to a union of types
+ - storing it into a structure
+ - then using it for lookup, which uses different branches depending on the type and does some conversions.
+We can drastically simplify that:
+ - convert the something to just a string
+ - store this simple type (string) 
+ - do a simpler lookup using this simple type
+It is easier to reason about the flow of info.",2017-08-17 20:45:09,thunterdb
+405,"I take it back, you need each of the function (input and output), but instead of reverting the dict, you can simply have have a conversion function that you use like  `[k, convert(tensor) for ...]` and `[convert(tensor), name for ...]`",2017-08-17 20:47:04,thunterdb
+406,Same comment as above.,2017-08-17 20:47:30,thunterdb
+407,Doc please.,2017-08-17 20:50:01,thunterdb
+408,We should be better reversing the input mapping to match `feed_dict` in `tf.session.run` and TensorFrames `map_row`.,2017-08-18 17:22:52,phi-dbq
+409,`tensor_name`,2017-08-22 17:19:43,thunterdb
+410,"We have 5 functions that compute some names in this file, this is at least two too many.",2017-08-22 17:20:41,thunterdb
+411,"The analyze() function is not smart enough currently to know that the data is already analyzed, so it make take a substantial amount of time. This is an easy fix in tensorframes though.",2017-08-22 17:47:38,thunterdb
+412,"I see why you need this currently. There is a `feed_dict` arguments for `map_rows` that does exactly what you want in tensorframes. It still needs to be implemented for `map_blocks`, but this is a quick fix.",2017-08-22 17:48:55,thunterdb
+413,"Once this argument is there, this block of code will not be required anymore.",2017-08-22 17:49:20,thunterdb
+414,"Also, errors here are going to be confusing because you are renaming the columns.",2017-08-22 17:49:46,thunterdb
+415,@phi-dbq what do you mean by flaky? I do not understand why simply using `import_graph_def` would not work here.,2017-08-22 17:53:48,thunterdb
+416,why are there new lines here?,2017-08-22 17:55:19,thunterdb
+417,"Sometimes one might use a session without resetting the default graph. 
+```
+with tf.Session() as sess:
+    tf.import_graph_def(graph_def, name='')
+    sess.run(...)
+``` 
+
+In case there is a default graph and there is a name conflict, the tensors in the imported graph will be renamed automatically. 
+(if we pass an exising graph as `tf.Session(grarph=existing_graph) as sess`, it seems to use the default graph properly inside the session. )",2017-08-22 22:46:01,phi-dbq
+418,this is unused?,2017-08-23 20:40:03,sueann
+419,unused?,2017-08-23 20:40:25,sueann
+420,unused,2017-08-23 20:41:17,sueann
+421,"I thought the internal logic here might change given the changes in tensorframes, is that not true?",2017-08-25 00:22:35,sueann
+422,"But in this case there isn't another graph in the session right? So there is no need to have the complex logic around the graph / graphdef. Could lines 70-92 just be:
+```
+analyzed_df = tfs.analyze(df)
+
+# prune the graph for tensorframes
+with tf.session(graph=self.getTFGraph()) as sess:
+  fetches = [tfx.get_tensor(sess.graph, tnsr) for tnsr, output_colname in self.getOutputMapping()]
+  gdef = tfx.strip_and_freeze_until(fetches, sess.graph, sess)
+
+with tf.session() as sess2:
+  output_names = [tfx.validated_output(sess.graph, elem) for elem in fetches]
+  tf.import_graph_def(gdef,
+                                    input_map=None,
+                                    return_elements=output_names,
+                                    name='')
+  final_fetches = [tfx.get_tensor(sess2.graph, name) for name in output_names]
+  out_df = tfs.map_blocks(final_fetches, analyzed_df)
+
+  for tnsr, output_colname in self.getOutputMapping():
+    out_df = out_df.withColumnRenamed(tfx.op_name(sess.graph, tnsr), output_colname)
+```
+?
+
+With IsolatedSession and GraphFunction, it's hard for anyone not intimately familiar with those classes to understand what's going on here. It makes it seem like you are just creating a GraphFunction object then getting back exactly what you put in. With more explicit code like above, it's easier to tell what exactly we're doing (pruning the graph into graphdef and re-importing). Also it seems shorter...
+
+A few questions:
+1/ I thought the tensorframes changes were done to remove the necessity for freezing+reimporting? But I may be wrong there (didn't really look at the tensorframes PR).
+2/ In https://github.com/databricks/spark-deep-learning/blob/master/python/sparkdl/graph/builder.py#L91 (and potentially in the code I wrote above), do we need to check that no output has been stripped from the graph? Or is that not possible because the outputs were fed into the strip/freeze function and would be kept even if an output was ""floating"" and would have been stripped normally?",2017-08-25 00:48:02,sueann
+423,Where do you deal with batch size? Is that part of TFHParams?,2017-08-25 16:54:03,anfeng
+424,can we have a test program that construct transformer directly from a checkpoint file?,2017-08-25 17:00:22,anfeng
+425,Remove GraphFunction as it is internal API,2017-08-26 00:07:12,phi-dbq
+426,"With the latest tensorframes, we no longer need to rename input columns to match the graph tensor/operation names.",2017-09-01 18:03:02,phi-dbq
+427,We still need to rename output columns. But that is consistent with the `map_row` API. ,2017-09-01 18:04:01,phi-dbq
+428,"With the latest tensorframes, we don't have to collect input renaming mapping.",2017-09-01 18:04:43,phi-dbq
+429,"This a thin wrapper on top of `strip_and_freeze` utility function. 
+I prefer to use it here as it hides us from the implementation details of said function, and gives the library maintainers an easy option to upgrade the underlying definition. 
+It will be great if this library's exposure to TensorFlow API is limited.",2017-09-01 18:10:17,phi-dbq
+430,"The idea is that a user will provide one of the followings
+1. a checkpoint directory
+2. a tensorflow serving saved_model directory
+3. a tensorflow graph object. 
+
+We will convert all to an internal serializable format.",2017-09-01 18:13:01,phi-dbq
+431,"When a `signature_def` is provided, the semantics of `inputMapping` and `outputMapping` change. 
+Instead of mapping DataFrame columns to/from tensor/operation names, they now map columns to keys in the `signature_def` lookup table, which returns the actual tensor/operation names. ",2017-09-01 18:16:18,phi-dbq
+432,We should probably make this process more transparent to users.,2017-09-01 18:16:42,phi-dbq
+433,"There are multiple ways to get tensor/operation names in this utility module. 
+We should definitely consolidate the functions `as_tensor_name` and `tensor_name`. 
+Right now, the semantic of the two functions are:
+1. `as_tensor_name`: return the tensor's name of the input (without necessarily check if it exists in any graph). 
+2. `tensor_name`: return the tensor's name only if the input exists in the given graph. ",2017-09-01 18:21:44,phi-dbq
+434,"I am using a converter function in `sparkdl.graph.utils` to convert the tensor/operation object into the corresponding operation name. If the operation is named `inputPlaceholder`, the tensor name is `inputPlaceholder:0`. TensorFrames expects the operation name. ",2017-09-01 20:43:04,phi-dbq
+435,"I am using a converter function in `sparkdl.graph.utils` to convert the tensor/operation object into the corresponding operation name. If the operation is named `inputPlaceholder`, the tensor name is `inputPlaceholder:0`. TensorFrames expects the operation name. ",2017-09-01 21:01:27,phi-dbq
+436,"The shape and data types of the model are stored in the serving signature.
+As long as the signature key (here `prediction_signature`) and the input/output keys (here `input_sig` and `output_sig`) are well known. The underlying model can use any tensor name the model builder desires. 
+```
+sigdef: {u'prediction_signature': inputs {
+  key: ""input_sig""
+  value {
+    name: ""tnsrIn:0""
+    dtype: DT_DOUBLE
+    tensor_shape {
+      dim {
+        size: -1
+      }
+      dim {
+        size: 17
+      }
+    }
+  }
+}
+outputs {
+  key: ""output_sig""
+  value {
+    name: ""tnsrOut:0""
+    dtype: DT_DOUBLE
+    tensor_shape {
+      dim {
+        size: -1
+      }
+    }
+  }
+}
+}
+```",2017-09-02 05:07:29,phi-dbq
+437,"I strongly disagree. Calling strip_and_freeze directly also hides the details of the function, so why do we need another wrapper on top of fit? It's very time-consuming to understand the IsolatedSession code which means ample room for mistakes in coding and debugging this code here.",2017-09-06 20:17:30,sueann
+438,did you mean to remove this?,2017-09-11 17:51:24,sueann
+439,Actually remove it please :-),2017-09-11 17:52:28,sueann
+440,Talked offline - shouldn't need this option anymore.,2017-09-11 17:53:44,sueann
+441,should be above line 100 since `SparkDLTypeConverters` is new too,2017-09-11 17:55:27,sueann
+442,i wouldn't change the indentation here because it's a copy of PySpark and it just creates another diff that isn't necessary. ,2017-09-11 17:57:34,sueann
+443,is it tensor or op name we want in these mappings? here it's implemented as op but HasInputMapping and HasOutputMapping docs say tensor.,2017-09-11 18:01:23,sueann
+444,"names not objects, right?",2017-09-11 18:02:00,sueann
+445,names not objects right?,2017-09-11 18:02:25,sueann
+446,"""Mixin for param tfGraph which represents a TensorFlow Graph object. See the Param def below for what is accepted.""",2017-09-11 18:11:43,sueann
+447,"""TensorFlow Graph, TensorFlow GraphDef, or TFInputGraph. To use checkpoint files or SavedModel files here, see TFInputGraphBuilder.""",2017-09-11 18:12:05,sueann
+448,This and `TFInputGraphBuilder`  below should live in its own file like python/sparkdl/graph/input.py,2017-09-11 18:14:21,sueann
+449,remove (comment not necessary),2017-09-11 18:14:59,sueann
+450,shouldn't SparkDLTypeConverters.toTFInputGraph get applied automatically somewhere from the Param framework? it doesn't seem right that we call this converter function directly.,2017-09-11 18:23:14,sueann
+451,Talked offline -- TFInputGraph should be a super thin wrapper containing graph_def. It's constructor really shouldn't be called by the user and they should use TFInputGraphBuilder below -- we should at least document this and warn that the API could change for the constructor here.,2017-09-11 19:21:57,sueann
+452,"Remove this comment. As the name suggests, the converters are mean to be for SparkDL generally (though they are mostly for TensorFlow, there is one that's generically model name at the bottom, for example).",2017-09-11 20:39:27,sueann
+453,"from our earlier discussion, i thought this would look like 
+```
+  inputMapping={
+    input_col: 'input_sig',
+  }
+```
+no? If `input_col: 'tnsrIn'` is what's expected, we don't need the helper functions or the sigDefKey logic to get the inputMapping and outputMapping, do we?",2017-09-11 20:54:30,sueann
+454,remove if not used.,2017-09-11 20:54:43,sueann
+455,"let's have all the `test_build_...` tests in this class use the same graph. can we refactor so we have a helper function constructing the graph? (i know it's annoying with session etc, but it's possible.)",2017-09-11 20:55:31,sueann
+456,what are we trying to accomplish with this test? is the goal to test a larger graph (doesn't look that big?)? or test compatibility with keras? ,2017-09-11 20:59:47,sueann
+457,"I think apart from `feetds` and `fetches` in `session.run`, all the references use `tf.Operation` names. I will update the docs.",2017-09-11 22:55:25,phi-dbq
+458,Isn't it possible though to have two tensors with the same op name in the mappings?,2017-09-11 23:18:42,sueann
+459,The motivation is to see if we can build TFTransformer from TF + Keras mixed layers. ,2017-09-12 05:22:52,phi-dbq
+460,"It's good to know that works, though I am not sure why we would question that it works in this context (i.e. this doesn't seem like the right place to test that vs tensorframes and/or the strip_and_freeze unit tests - yes i know we don't have any). in any case, i'd leave it in for now but add a TODO comment to remove it once we add the keras transformer.",2017-09-13 01:01:01,sueann
+461,It might happen for ops that return multiple tensors. These operations are not common for inputs and outputs in TensorFlow graphs. I will update the documentation to clarify. ,2017-09-13 19:05:40,phi-dbq
+462,Then let's make them tensor names instead of op names (we do that in other transformers in sparkdl anyway). Any reason why op names are much more preferable?,2017-09-13 20:20:12,sueann
+463,"We might actually not be able to do this since `TensorFrames` name the output column to the operation name ([we do this in tf_image module](https://github.com/databricks/spark-deep-learning/blob/master/python/sparkdl/transformers/tf_image.py#L140-L144)). 
+If there are two tensor outputs from the same operation, there will be a column name conflict. ",2017-09-13 20:39:13,phi-dbq
+464,I will document the actual converted type here and indicate what types are automatically converted. ,2017-09-13 20:42:32,phi-dbq
+465,That sounds very useful. Shall we make a separate PR to refactor the `test_build_...` tests?,2017-09-13 20:45:06,phi-dbq
+466,"My comment was, the user should give a mapping {dataframe column name : tensor name} not {data frame column name : tensor object} but the documentation says otherwise. They don't need to know about internal conversions.",2017-09-13 20:46:01,sueann
+467,"I see. We only output one tensor/op in the image transformers so this is not a problem there. 1/ Could we put a check in the output mappings and warn if there are two tensors with the same op name? 
+2/ Let's make sure users only deal with tensor names and op names are internal (not sure if this is already true in the code).",2017-09-13 20:50:09,sueann
+468,"I'd just refactor here. It's not a adding another feature, just making the code more readable and debuggable as it should have been.",2017-09-13 20:51:07,sueann
+469,Refactored so that the conversion logic lives here. ,2017-09-13 21:28:53,phi-dbq
+470,"When the user specifically indicated not to use SignatureDef by setting `signature_def_key=None`, we expect the operation names to be provided.  
+When they want to use signature_def, they will call `get_params_from_XXX` to construct parameters. ",2017-09-13 21:38:14,phi-dbq
+471,They are YAPF'ed along with the rest of this module. Looks like PySpark could improve on format/style. Will convert them back to PySpark. ,2017-09-13 21:44:39,phi-dbq
+472,all rows (not elements)?,2017-09-13 22:48:51,sueann
+473,this variable is unnecessary ,2017-09-13 22:49:49,sueann
+474,this shouldn't be possible anymore,2017-09-13 22:51:44,sueann
+475,create a separate test for this section. tests should be as small as possible so it's easy to identify what is failing without having to rerun the tests with prints etc.,2017-09-21 20:50:43,sueann
+476,"actually, isn't this covered by the case `[('a', 1), ('b', 2)]` above already?",2017-09-21 20:51:51,sueann
+477,"does the test pass if just one of `asColumnToTensorNameMap` and `asTensorNameToColumnMap` fail? there are many cases being tested here and it's hard to figure out what exactly we're expecting. if both of them should fail, we should split them into two `with self.assertRaises` sections.",2017-09-21 20:54:11,sueann
+478,"what was the final verdict on the python style here? I think the original here was the one? i.e. 
+```
+  blah = Function(abcdefg, hijklmnopqrstuv,
+                  wxyzlmnopaodifjwoeirjawoijr)
+```
+cc @MrBago @jkbradley ",2017-09-21 20:56:23,sueann
+479,the style is inconsistent among the files in this PR so we should pick the style and make them consistent.,2017-09-21 20:57:19,sueann
+480,i thought we were supporting only tensor names not op names per the design doc. do we need this conversion logic in that case (if we support only tensor names)? it'd be better to support just the tensor name and avoid as much conversion logic as possible.,2017-09-21 21:09:06,sueann
+481,Confirmed with team that's the style we'll go with - please change the style for all the instances in the PR. Thanks!,2017-09-21 21:14:31,sueann
+482,Did that. Please check the `params_test.py` module and see if you like the way these tests are added.,2017-09-25 18:05:17,phi-dbq
+483,Did this as well. See above,2017-09-25 18:05:33,phi-dbq
+484,Did this with changed YAPF,2017-09-25 18:05:45,phi-dbq
+485,Updated this to only allow strict tensor names. ,2017-09-25 18:19:50,phi-dbq
+486,"`_try_convert_tf_tensor_mapping` gets used twice, once with `is_key_tf_tensor=True` and once with `is_key_tf_tensor=False`. This means there really should just be two different functions. Try writing out the logic directly in `asColumnToTensorNameMap` and `asTensorNameToColumnMap`. If there are small bits of code that are sharable you can have helper functions, but let's not even do that and see how it looks. I bet it is much shorter and simpler. It is okay to have *some* duplicated code if the duplicated code is not complicated.",2017-09-25 18:50:01,sueann
+487,"Other values will just get ignored, not result in errors, right? We can say ""Currently used values are: ""...",2017-09-25 18:52:17,sueann
+488,"nit: put the public methods at the top. In general, the most important content should be at the top of the file, because this is where you start reading from.",2017-09-25 21:16:52,thunterdb
+489,"I do not see the need for putting all these methods in a class object and declaring them `static`: only this class is defined in the file, all these methods are internal, and they do different things (they are not all constructor methods for the class, for instance). There is no reason in my mind to put them in a class. The file can be renamed `type_converters.py` though to help understanding.",2017-09-25 21:20:21,thunterdb
+490,"put a 3-line comments that explains what this file does. In general, it should always be the case.",2017-09-25 21:24:06,thunterdb
+491,do not use default arguments in private functions unless there are some very compelling reasons. This is a user-facing feature for API design.,2017-09-25 21:27:13,thunterdb
+492,"put docs for each of these methods. What are the inputs? What are the outputs? It is impossible in python to know that unless you follow through the code, and you will be hard pressed to know what these functions do in 6 months.",2017-09-25 21:28:58,thunterdb
+493,`tf.Graph` to be more precise.,2017-09-25 21:29:20,thunterdb
+494,"+1. You interleave condition checks for for `is_key_tf_tensor` 4 times in that function, it is best to split out.",2017-09-25 21:31:27,thunterdb
+495,nit: it is better to start with the type because it is very short and descriptive. The value itself my be a monster string and you want to put the most relevant info first.,2017-09-25 21:32:25,thunterdb
+496,"@phi-dbq sorry, this file is beyond my cognitive load to comprehend.
+
+If I am having a hard time to understand it now, I will definitely have an even harder time to diagnose why a test a failing. Please write down every test separately using a function. A test has multiple purposes, in order of priorities:
+  1. provide through some examples the specification of a function
+  2. when a modification is done subsequently, provide some assistance in diagnosing the failure
+  3. and least important, test a specific implementation
+
+This current file is probably right on the last point, but I am not able to verify the first point, and I am certain it will be not be of assistance for the second point. I am happy to discuss it more if you want. ",2017-09-25 21:43:01,thunterdb
+497,"Please do not go meta, see my comment above.",2017-09-25 21:43:32,thunterdb
+498,remove this,2017-09-25 21:53:27,phi-dbq
+499,I updated the test cases by using [parameterized](https://github.com/wolever/parameterized)  to generate individual test functions. ,2017-09-25 23:33:45,phi-dbq
+500,"This class has been there since we created this package.
+https://github.com/databricks/spark-deep-learning/blob/789d2a68feeec1892af2c97e3a90a047545e1f70/python/sparkdl/transformers/param.py#L97
+
+The reason we had it in this format is to match the `TypeConverter` in Spark MLlib.
+https://github.com/apache/spark/blob/master/python/pyspark/ml/param/__init__.py#L77",2017-09-26 01:10:48,phi-dbq
+501,"this is much more readable! one question for you -- if the test fails on one of the cases, what would the output look like? will i be able to quickly identify which test case failed?",2017-09-26 03:04:12,sueann
+502,"'tensor name required' should be good enough, since it's not clear what ""strict tensor name"" is to everyone.",2017-09-26 03:04:38,sueann
+503,same here,2017-09-26 03:04:43,sueann
+504,nit: get -> got,2017-09-26 03:04:54,sueann
+505,"Thanks :D 
+The test cases will be appended to the docstring of the base test function.
+Here is what it looks like if a test fails. 
+```
+============= Running the tests in: tests/param/params_test.py =============
+Using TensorFlow backend.
+Test invalid column name to tensor name mapping [with data=['a1', 'b2'], description='required pair but got single element'] ... ok
+Test invalid column name to tensor name mapping [with data=('c3', 'd4'), description='required pair but got single element'] ... ok
+Test invalid column name to tensor name mapping [with data=[('a', 1), ('b', 2)], description='only accept dict, but got list'] ... ok
+Test invalid column name to tensor name mapping [with data={1: 'a', 2.0: 'b'}, description='wrong mapping type'] ... ok
+Test invalid column name to tensor name mapping [with data={'a': 1.0, 'b': 2}, description='wrong mapping type'] ... ok
+Test invalid column name to tensor name mapping [with data={'colB': 'tnsrOpB', 'colA': 'tnsrOpA'}, description='tensor name required'] ... ok
+Test invalid column name to tensor name mapping [with data={'colB': 'tnsrOpB:1', 'colA': 'tnsrOpA:0'}, description='tensor name required'] ... FAIL
+Test invalid tensor name to column name mapping [with data=['a1', 'b2'], description='required pair but got single element'] ... ok
+Test invalid tensor name to column name mapping [with data=('c3', 'd4'), description='required pair but got single element'] ... ok
+Test invalid tensor name to column name mapping [with data=[('a', 1), ('b', 2)], description='only accept dict, but got list'] ... ok
+Test invalid tensor name to column name mapping [with data={1: 'a', 2.0: 'b'}, description='wrong mapping type'] ... ok
+Test invalid tensor name to column name mapping [with data={'a': 1.0, 'b': 2}, description='wrong mapping type'] ... ok
+Test invalid tensor name to column name mapping [with data={'tnsrOpB': 'colB', 'tnsrOpA': 'colA'}, description='tensor name required'] ... ok
+Test valid input mapping conversion ... ok
+Test valid output mapping conversion ... ok
+
+======================================================================
+FAIL: Test invalid column name to tensor name mapping [with data={'colB': 'tnsrOpB:1', 'colA': 'tnsrOpA:0'}, description='tensor name required']
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File ""/usr/local/lib/python2.7/site-packages/parameterized/parameterized.py"", line 392, in standalone_func
+    return func(*(a + p.args), **p.kwargs)
+  File ""/Users/philipyang/CodeBase/spark-deep-learning/python/tests/param/params_test.py"", line 71, in test_invalid_input_mapping
+    SparkDLTypeConverters.asColumnToTensorNameMap(data)
+AssertionError: TypeError not raised
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.002s
+```",2017-09-26 18:27:44,phi-dbq
+506,Standardized all the converter err msgs,2017-09-26 18:52:36,phi-dbq
+507,change doc ?,2017-09-26 18:54:58,phi-dbq
+508,change doc?,2017-09-26 18:55:09,phi-dbq
+509,yet another module I was not aware of.,2017-09-26 21:59:10,thunterdb
+510,mark as change doc => will modify as the last step,2017-09-27 17:14:02,phi-dbq
+511,"mark as change doc => will modify as the last step
+",2017-09-27 17:14:15,phi-dbq
+512,"mark as change doc => will modify as the last step
+",2017-09-27 17:15:41,phi-dbq
+513,"As a part of refactoring, this function has changed already.
+
+In general, though, I would say having default arguments is quite useful at least for the following reasons. 
+1. Serve as type annotation: in most IDEs, the signature is the only thing to show when browsing code. 
+2. In certain cases, provide meaningful default settings. ",2017-09-27 17:26:24,phi-dbq
+514,"mark as change doc => will modify as the last step
+",2017-09-27 17:26:43,phi-dbq
+515,"Adding methods to a test class programmatically is a must for our use case. The unit-test framework we use does not have good support for parameterized tests, leaving us no choice but to look externally.
+
+Meta-classes are a supported feature in python [from Guido's treatise](https://www.python.org/download/releases/2.2.3/descrintro/#metaclasses).
+In fact, we use it already [in this codebase](https://github.com/databricks/spark-deep-learning/blob/master/python/sparkdl/transformers/keras_applications.py#L37).
+It might require some effort to parse, but they are natively supported, making the test infra easier to maintain.
+
+On the other hand, using an external project might make code look cleaner, but it might also add considerable maintenance burden to us. Fortunately, the one we found, [parameterized](https://github.com/wolever/parameterized), is an actively maintained small project. ",2017-09-27 17:46:27,phi-dbq
+516,"Noted, thanks! Please see my response above. ",2017-09-27 17:47:15,phi-dbq
+517,"In general, I believe this thread https://stackoverflow.com/questions/2438473/what-is-the-advantage-of-using-static-methods-in-python provides good explanations as to why we might want to use static method sometimes. ",2017-09-27 17:53:40,phi-dbq
+518,"As part of refactoring, this helper function has gone away. 
+
+I wanted to combine them in the first place so that I do not have to duplicate the type checking logic. 
+It is always a trade-off. I hope that in this refactored version, the balance is tipped to our preference. ",2017-09-27 17:57:34,phi-dbq
+519,"Convert the given value to a mapping, from a column name tf.Tensor name if possible. The result will be a list of string pairs, sorted by the key (column name).
+",2017-09-27 18:17:33,sueann
+520,"^ not sure if it's sorted by key or value, so please make it correct :-)",2017-09-27 18:17:53,sueann
+521,"I prefer returning early in the function for clarify as well as less indentation, e.g.
+``` 
+  if not isinstance(...):
+    raise TypeError(...)
+  
+  # more complex logic here
+```
+but it's treated as more of a personal preference currently here.",2017-09-27 18:19:50,sueann
+522,this comment was for tensor_name below,2017-09-27 18:32:15,sueann
+523,ok sounds good.,2017-09-27 20:23:00,thunterdb
+524,"yet another model I did not know about, great finding and usage!",2017-09-27 20:23:26,thunterdb
+525,"this is not doing any conversion, this is just checking the cast.",2017-09-27 20:26:42,thunterdb
+526,"Do not return different things, especially in python in which it is hard to track. From the way you are using it, it should always be a string.",2017-09-27 20:28:38,thunterdb
+527,"it is not a converter, it does not convert anything. This function should be called something like `buildCheckList`",2017-09-27 20:32:56,thunterdb
+528,"same thing, this is not a conversion.",2017-09-27 20:33:30,thunterdb
+529,I feel we already have a million of these methods.,2017-09-27 20:34:32,thunterdb
+530,"I know that some modules in Spark do implement some static functions in classes, but I question the use of this pattern in this module, because these are all internal, disparate functions that do not need to be associated together, and we do not have a strong focus on exposing a developer API like MLlib.
+
+@MrBago , do you see some compelling reasons for grouping functions together in this context? I knows some other modules have this pattern, but my sense is that this is not the pythonic way of doing things.",2017-09-27 22:22:31,thunterdb
+531,Is that good or bad @thunterdb ? :-),2017-09-27 23:39:12,sueann
+532,I think this case is okay since it really is the convention in Spark ML... :-(,2017-09-27 23:39:52,sueann
+533,"I agree with @thunterdb  on that function naming should be precise. However, the entire Spark MLlib Param class promotes this idea of a ""TypeConverter"", so I think it's actually more confusing if we start naming things not similarly to the ones in Spark MLlib (i.e., XXConverter, toYY)... Unless @jkbradley says otherwise :-P",2017-09-27 23:42:44,sueann
+534,"Talked with @jkbradley and he didn't have strong opinions, but since all of these functions return the input value if it is of type Y in toY(), we should keep the function names toY(). ",2017-09-28 00:30:21,sueann
+535,"These _get_strict... functions don't actually convert anything, so we don't need to call functions that looks like they do. Instead of the _get_strict_... functions, I'd create two functions: `_check_is_str` and `_check_is_tensor_name` that throw errors if the types are not right (the latter can use the former inside). Then this section becomes (from line 71-75):
+```
+for tensor_name, col_name in value.items():
+  _check_is_str(col_name)
+  _check_is_tensor_name(tensor_name)
+```
+
+
+",2017-09-28 00:40:18,sueann
+536,"As per my comment above, this can be changed to `_check_is_tensor_name(name)` that just checks that name is a string (using `_check_is_str`) and that doesn't have a "":"".
+
+The current logic in `_get_strict_tensor_name` duplicates checks in `as_tensor_name`, and `as_tensor_name` does more than what we want here, so there is no need to call that. I understand we want to potentially give more descriptive error messages, but I think just checking that it roughly looks like a tensor name is good enough (and that's all we're doing here currently anyway).",2017-09-28 00:41:57,sueann
+537,ok,2017-09-28 16:27:14,thunterdb
+538,"It is amazing! Python comes with batteries, spare tires and driving maps included.",2017-09-28 16:28:37,thunterdb
+539,"+1 with Sue Ann. These functions are trivial, but this is good practice in the future.",2017-09-28 16:29:18,thunterdb
+540,"given the context, it is sorted by key, but it is subtle indeed (lexicographic order on pairs)",2017-09-28 16:30:19,thunterdb
+541,"These are only used in the current file, no need to put them inside the class. ",2017-09-29 01:34:13,phi-dbq
+542,best off putting them into `setParams` so that it is clear they are set there.,2017-09-29 01:35:23,phi-dbq
+543,setting `inputTensor=utils.IMAGE_INPUT_PLACEHOLDER_NAME` will cause TensorFlow to throw an error since `utils.IMAGE_INPUT_PLACEHOLDER_NAME` cannot be interpreted as a Tensor name. ,2017-09-29 01:36:31,phi-dbq
+544,removing private constants out of class def,2017-09-29 01:36:58,phi-dbq
+545,removing private constants out of class def,2017-09-29 01:37:02,phi-dbq
+546,removing private constants out of class def,2017-09-29 01:37:07,phi-dbq
+547,"I think the reason why I started it this way are:
+- There are other private methods that we don't want to export. Otherwise, we have to manually specify every single exported method. 
+- MLlib developers have used this pattern for a while. They may feel more comfortable using it this way.",2017-09-29 01:40:59,phi-dbq
+548,"Interestingly, Google uses something like this in their testing framework https://github.com/abseil/abseil-py/blob/master/absl/testing/parameterized.py",2017-09-29 05:06:49,phi-dbq
+549,"Done. All the ""converters"" follow this convention. ",2017-09-29 05:09:37,phi-dbq
+550,definition -> defining,2017-09-29 22:31:38,sueann
+551,"These aren't really ""Factory methods"". ""Methods"" should be fine.",2017-09-29 22:31:58,sueann
+552,the function name is self-explanatory so you don't need this comment. comments aren't alway good because the code logic can change and the comment can be forgotten and not changed. there are lots of wrong comments in many codebases. ,2017-09-29 22:34:34,sueann
+553,remove comment - this should be obvious,2017-09-29 22:34:42,sueann
+554,remove comment,2017-09-29 22:34:49,sueann
+555,remove comment,2017-09-29 22:35:41,sueann
+556,remove comment,2017-09-29 22:35:47,sueann
+557,remove comment,2017-09-29 22:35:52,sueann
+558,"let's make this comment correct: ""Check that the given value is a :py:obj:`tf.contrib.training.HParams` object and return it. Raises an error if not.""",2017-09-29 22:37:26,sueann
+559,we don't need this since `_check_is_tensor_name` is good enough,2017-09-29 22:40:21,sueann
+560,the output is not used so don't return. ,2017-09-29 22:41:41,sueann
+561,the output is not used so don't return,2017-09-29 22:42:37,sueann
+562,not sure what the new name is conveying. why the change?,2017-09-29 22:44:44,sueann
+563,let's try not to change existing code that is not relevant to the current PR unless it's really trivial (not just implementation but also the reason). it adds to the review & discussion time unnecessarily. ,2017-09-29 22:45:25,sueann
+564,last step of this PR or in another PR? seems like a trivial change we can just make here intead of having to keep track of it for later.,2017-09-29 22:47:11,sueann
+565,"I'm confused why this logic was changed. 
+1/ does tf.Graph.get_tensor_by_name(tf.Tensor) return the Tensor?
+2/ let's not change files that aren't being touched at all by the main objective of the PR as it increases the review time unnecessarily. you can make mini PRs for these if you really want.",2017-09-29 22:50:51,sueann
+566,Did you run into a problem with tf_image.py in this PR or tests? Not sure why this change was made here.,2017-09-29 22:52:04,sueann
+567,What happens with `inputTensor` if someone never uses setParams? Seems breakable.,2017-09-29 22:53:48,sueann
+568,"This change was requested from a previous review comment. 
+The original name was a bit confusing as this function itself is not a ""converter"",  but it builds a ""converter"" that checks if `value` is in the `supportedList`. 
+The name was also suggested in the review comment. I usually take these type of suggestions.",2017-10-02 17:54:18,phi-dbq
+569,The reason is any change takes a hour-long rebuild for Travis CI. It's reasonable to do code change first and then doc update when the code changes are accepted. ,2017-10-02 18:05:27,phi-dbq
+570,"Previously, if anyone chose not to set `inputTensor` (either in the constructor or using the setter method), the default `utils.IMAGE_INPUT_PLACEHOLDER_NAME` will be used. (In fact, the default is always set to this value).
+
+Later on, we will call `self.getGraph().get_tensor_by_name(tensor_name)`, in which case if the default value is used, will cause TensorFlow to throw an exception. 
+
+It happens that all of our code set `inputTensor`. But if our users choose to use interact directly with `TFImageTransformer` and use the default, they will encounter that exception.  ",2017-10-02 18:16:29,phi-dbq
+571,"1. `tf.Graph.get_tensor_by_name(tensor_name)` returns the tensor.  But it requires the tensor name, not the operation name. It eventually follows [this code path](https://github.com/tensorflow/tensorflow/blob/r1.3/tensorflow/python/framework/ops.py#L2771-L2782).
+2. This kind of ""converter-return-single-type"" motif has been requested several times in the past PR comments. The changes needed to enforce it is rather small and not touching any core logic. ",2017-10-02 18:29:53,phi-dbq
+572,"@phi-dbq as a general philosophy, code changes should always be coming with their documentation (unless there is a specific task to track the documentation) because wrong documentation is even worse than no documentation.",2017-10-02 18:53:57,thunterdb
+573,"Sorry it's really hard to see previous comments in github. But regardless, `buildCheckList` doesn't invoke any sense to me that it's building one of these Converters that checks against a list. maybe `buildSupportedItemConverter` or `buildSupportedItemChecker`. Still would go with Converter because it's the common terminology in mllib for where these are used (as the last parameter ""TypeConverter"" in Param definitions).",2017-10-02 20:54:07,sueann
+574,"I see what bug it was fixing, but in the future PLEASE put such unrelated changes in another PR. This kind of distraction causes delays in getting the PR in, as well as cause additional difficulties in debugging later on when trying to identify which PR a bug may come from. For example, most of my comments in this review round are about this file. In the future, I will ask you to break up the PR in such cases.",2017-10-02 21:00:38,sueann
+575,Sorry I missed that `__init__` calls `setParams` so defaults should always be set and it's okay.,2017-10-02 21:05:34,sueann
+576,"you can make the change in a later PR, but let's add that these are optional (they are, right?)",2017-10-04 17:35:13,sueann
+577,`it's okay` -> `it is acceptable`,2017-10-14 01:21:16,thunterdb
+578,return type,2017-10-19 00:42:39,thunterdb
+579,also put `tgtChannels` in the text of the assertion,2017-10-19 00:43:09,thunterdb
+580,can you separate the code that creates `BufferedImage` in a function? I am sure there will be other usages.,2017-10-19 00:44:01,thunterdb
+581,this is going to do pattern matching and allocation of an object. You can define 3 `var`s instead.,2017-10-19 00:44:42,thunterdb
+582,I wonder if you can create the color outside and just set the channels with getters.,2017-10-19 00:45:25,thunterdb
+583,"same thing, can you separate this code in a function?",2017-10-19 00:46:00,thunterdb
+584,"if you can, I wonder if there is a way not to allocate objects in the loop.",2017-10-19 00:46:25,thunterdb
+585,`spark.ml.image`,2017-10-19 00:46:55,thunterdb
+586,`null`? I wonder if we should carry it over instead. This is not specified in any case.,2017-10-19 00:47:30,thunterdb
+587,"I cannot see the image, but are you sure they have a good license?",2017-10-19 00:48:04,thunterdb
+588,"+1
+Also, can we move srcChannels outside the while loop? If is determined per image, and matching them inside the loop incurs some overhead.",2017-10-19 01:24:41,phi-dbq
+589,"Same as before, this test is better done outside the while-loop. 
+And we should report the value of the faulty `srcChannels` parameter.",2017-10-19 01:26:00,phi-dbq
+590,"I looked into it after we talked last week, and Color is immutable. I don't know why Color, or all things, is immutable in java...
+
+I can replace `rgb = Color(red, green, blue).getRGB` with `rgb = (red << 16 | green << 8 | blue)`. But I think that's kinda gross.",2017-10-19 01:26:44,MrBago
+591,"As we discussed offline, this might potentially have dependencies on the platform's GUI implementation, which might cause trouble if they are disabled in some deployments. ",2017-10-19 01:28:09,phi-dbq
+592,done,2017-10-19 20:44:20,MrBago
+593,done,2017-10-19 20:44:28,MrBago
+594,done,2017-10-19 20:44:35,MrBago
+595,done,2017-10-19 20:44:41,MrBago
+596,"Color objects can't be re-used, the only way we can avoid create color objects is the manipulate the bits directly, ie `rgb = (red << 16 | green << 8 | blue)`.",2017-10-19 20:46:15,MrBago
+597,"I don't think carrying over is the right thing to do, once we've manipulated it, this image is different than the one at `origin`. But, admittedly this really depends on what the purpose/definition of the origin field is :).",2017-10-19 20:49:36,MrBago
+598,"I've dropped this raw files altogether, and switched to reusing images we already have in the repo.",2017-10-19 20:50:13,MrBago
+599,done,2017-10-19 20:50:25,MrBago
+600,"As we discussed offline, one concern of having this function is that it might depend on the underlying GUI rendering system. If such system is deliberately removed, it could fail. Could you please check at least if the Linux implementation has such dependencies? 
+
+",2017-10-19 05:21:40,phi-dbq
+601,Would the drawImage have any primary or secondary interaction with the framebuffer? ,2017-10-19 05:22:51,phi-dbq
+602,"As we discussed this offline, can we add documentation for the implicit dependency on `spark.ml.image` ImageSchema?",2017-10-19 05:25:02,phi-dbq
+603,"Let's refactor this code into two loops, one for `srcChannels == 1` and one for `srcChannels == 3`. 
+This way we only have to deal with the condition once outside the loop, making the code more performant. ",2017-10-19 05:28:03,phi-dbq
+604,"The contract, as I believe, is that `DeepImageFeaturizer` should behave the same whether we call it from Scala or from Python. Let's find out a way to make sure they do and add tests.
+Thank you!",2017-10-19 05:29:54,phi-dbq
+605,"There are quite a few round trips for the image bytes. 
+If there is an existing library that does this efficiently (which I believe there is), I think it is worth it to incorporate it as a dependency. 
+
+In addition, since we already depend on TensorFlow, we may consider reusing some of its image utilities.",2017-10-19 05:32:54,phi-dbq
