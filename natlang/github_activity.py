@@ -17,29 +17,30 @@ from github import Github
 
 import matplotlib.pyplot as plt
 
+def fetch_original_dataset():
+    # Interact with GitHub
+    g = Github()
+    repo = g.get_repo('databricks/spark-deep-learning')
+    comments = []
+    for comment in repo.get_pulls_comments():
+        comments.append(comment)
+
+    # Get only the time and date
+    return pd.DataFrame(dict(time_created=s.created_at,
+                             user=s.user.login,
+                             text=s.body)
+                        for s in comments)
+
+
 try:
-    print('number of comments', len(comments_data))
+    print(df.columns)
 except NameError:
-    data_root = Path.home() / 'local' / 'data'
-    fname = data_root / 'spark_dlp_all_comments.json'
-    with open(fname) as fin:
-        comments_data = json.load(fin)
-
-
-df = pd.DataFrame(comments_data)
-
-# Interact with GitHub
-g = Github()
-repo = g.get_repo('databricks/spark-deep-learning')
-comments = []
-for comment in repo.get_pulls_comments():
-    comments.append(comment)
-
-# Get only the time and date
-df = pd.DataFrame(dict(time_created=s.created_at,
-                       user=s.user.login,
-                       text=s.body)
-                  for s in comments)
+    _DF_FNAME = "spark_deep_learning_pipelines_pr_comments.csv"
+    try:
+        df = pd.read_csv(_DF_FNAME)
+    except:
+        df = fetch_original_dataset()
+        df.to_csv(_DF_FNAME)
 
 
 df.groupby('user').count()
@@ -57,7 +58,7 @@ vocab_idx2tok = {}
 for doc in nlp.pipe(df.text):
     tok_inds = []
     for tok in doc:
-        if tok.is_stop:
+        if tok.is_stop or tok.is_punct:
             continue
         text = tok.lower_
         idx = tok.lower
@@ -90,3 +91,19 @@ X_lda = lda.fit_transform(X)
 for comp in lda.components_:
     inds = np.argsort(comp)[-10:][::-1]
     print([vocab_idx2tok[wid] for wid in inds])
+
+for tpc_idx in range(lda.n_topics):
+    print('----- TOPIC: {} -------'.format(tpc_idx))
+    doc_inds = np.argsort(X_lda[:, tpc_idx])[::-1]
+    docs_sel = []
+    for i in doc_inds:
+        doc = docs[i]
+        if not doc: continue
+        docs_sel.append(doc)
+        print(' '.join([vocab_idx2tok[wid] for wid in doc]))
+        if len(docs_sel) > 10: break
+
+
+vocab_cntr = Counter()
+for doc in docs:
+    vocab_cntr.update(doc)
