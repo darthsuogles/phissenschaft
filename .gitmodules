@@ -4,3 +4,6 @@
 [submodule "sbt-spark-package"]
 	path = sbt-spark-package
 	url = https://github.com/databricks/sbt-spark-package.git
+[submodule "spark-nlp"]
+	path = spark-nlp
+	url = https://github.com/darthsuogles/spark-nlp.git
