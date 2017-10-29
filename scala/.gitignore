@@ -1,0 +1,4 @@
+target
+sbt
+*~
+SBT_RUNTIME_CLASSPATH

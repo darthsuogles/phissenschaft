@@ -1,12 +1,6 @@
-[submodule "scala_template/sbt-spark-package"]
-	path = scala_template/sbt-spark-package
-	url = https://github.com/databricks/sbt-spark-package.git
-[submodule "scala_template/spark-avro"]
-	path = scala_template/spark-avro
-	url = https://github.com/databricks/spark-avro.git
-[submodule "scala_template/spark-corenlp"]
-	path = scala_template/spark-corenlp
-	url = https://github.com/databricks/spark-corenlp.git
 [submodule "pixsrl/deck.gl"]
 	path = pixsrl/deck.gl
 	url = https://github.com/uber/deck.gl.git
+[submodule "sbt-spark-package"]
+	path = sbt-spark-package
+	url = https://github.com/databricks/sbt-spark-package.git

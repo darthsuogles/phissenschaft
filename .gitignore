@@ -2,3 +2,6 @@ target/
 target/*
 
 *.egg-info/
+
+spark-warehouse/
+metastore*/
