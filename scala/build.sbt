@@ -4,6 +4,7 @@ lazy val commonSettings = Seq(
   organization := "y.phi9t",
   version := "0.1",
   scalaVersion := LibVer.scala,
+  scalacOptions ++= scalafixScalacOptions.value,
   resolvers ++= Seq(
     DefaultMavenRepository,
     Resolver.mavenLocal,
