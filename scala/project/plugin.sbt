@@ -15,5 +15,5 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "latest.integration")
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "latest.integration")
 addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "latest.integration")
 
-addSbtPlugin("org.spark-packages" % "sbt-spark-package" % "0.2.6")
-addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.1")
+// addSbtPlugin("org.spark-packages" % "sbt-spark-package" % "0.2.6")
+// addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.1")

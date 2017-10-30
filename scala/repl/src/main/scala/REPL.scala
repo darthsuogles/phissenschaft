@@ -5,6 +5,8 @@ package y.phi9t.repl
 
 import java.io.{File, InputStream, OutputStream}
 
+import scala.collection.concurrent.TrieMap
+
 import ammonite.interp.Interpreter
 import ammonite.ops._
 import ammonite.runtime.{History, Storage}
@@ -36,7 +38,7 @@ object ReplMain extends App {
     predefCode = predef,
     colors = Colors.BlackWhite,
     welcomeBanner = Some(welcomeBanner)
-  )  
+  )
 
   replMain.run()
 }

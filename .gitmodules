@@ -7,3 +7,6 @@
 [submodule "spark-nlp"]
 	path = spark-nlp
 	url = https://github.com/darthsuogles/spark-nlp.git
+[submodule "dlsys/mshadow"]
+	path = dlsys/mshadow
+	url = https://github.com/darthsuogles/mshadow.git
