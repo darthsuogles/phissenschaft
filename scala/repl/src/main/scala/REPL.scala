@@ -3,18 +3,10 @@
   */
 package y.phi9t.repl
 
-import java.io.{File, InputStream, OutputStream}
 
-import scala.collection.concurrent.TrieMap
 
-import ammonite.interp.Interpreter
-import ammonite.ops._
-import ammonite.runtime.{History, Storage}
 import ammonite.{ Main => AmmReplMain }
-import ammonite.main.Defaults
-import ammonite.repl.{Repl, ReplApiImpl, SessionApiImpl}
 import ammonite.util._
-import ammonite.util.Util.newLine
 
 
 object ReplMain extends App {

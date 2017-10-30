@@ -4,7 +4,9 @@ lazy val commonSettings = Seq(
   organization := "y.phi9t",
   version := "0.1",
   scalaVersion := LibVer.scala,
-  scalacOptions ++= scalafixScalacOptions.value,
+  scalacOptions ++= scalafixScalacOptions.value ++ Seq(
+    "-Ywarn-unused-import"
+  ),
   resolvers ++= Seq(
     DefaultMavenRepository,
     Resolver.mavenLocal,
