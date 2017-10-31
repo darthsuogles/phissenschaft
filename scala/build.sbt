@@ -24,6 +24,13 @@ lazy val root = (project in file(".")).
     publishArtifact := false
   ).aggregate(repl, agent)
 
+lazy val core = (project in file("core")).
+  settings(commonSettings: _*).
+  settings(
+    name := "core",
+    publishArtifact := false
+  ).aggregate(repl)
+
 lazy val repl = (project in file("repl")).
   settings(commonSettings: _*).
   settings(
