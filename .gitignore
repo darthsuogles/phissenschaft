@@ -5,3 +5,19 @@ target/*
 
 spark-warehouse/
 metastore*/
+
+.sbt
+.Rhistory
+pixsrl/cb_2016_us_county_20m/
+*.rdf.gz
+
+*.py~*
+bazel-*
+.DS_Store
+
+*.jpg
+*.png
+*.log
+*.onnx
+
+spark/prebuilt/

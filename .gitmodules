@@ -10,3 +10,6 @@
 [submodule "dlsys/mshadow"]
 	path = dlsys/mshadow
 	url = https://github.com/darthsuogles/mshadow.git
+[submodule "dlsys/pyro"]
+	path = dlsys/pyro
+	url = https://github.com/darthsuogles/pyro.git
