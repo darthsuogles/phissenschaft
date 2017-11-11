@@ -11,6 +11,7 @@ metastore*/
 pixsrl/cb_2016_us_county_20m/
 *.rdf.gz
 
+.ipy3
 *.py~*
 bazel-*
 .DS_Store

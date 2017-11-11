@@ -1,0 +1,58 @@
+/**
+  * https://docs.oracle.com/javase/tutorial/essential/concurrency/
+  */
+// scalastyle:off
+import java.util.concurrent
+
+class SmplRunnable(tid: Int) extends Runnable {
+  override def run(): Unit = {
+    Thread.sleep(4000)
+    println(s"[Thread::$tid] from runnable")
+  }
+}
+
+val t1 = new Thread(new SmplRunnable(1))
+val t2 = new Thread(new SmplRunnable(2))
+
+t1.start()
+t2.start()
+
+class MessageLoop extends Runnable {
+  private[this] val messages = Seq(
+    "Mares eat oats",
+    "Does eat oats",
+    "Little lambs eat ivy",
+    "A kid will eat ivy too"
+  )
+
+  def msg(text: => String): Unit = {
+    println(s"[Thread::${Thread.currentThread().getName()}] ${text}")
+  }
+
+  override def run(): Unit = {
+    try {
+      messages.foreach { text =>
+        var sum: Long = 0L
+        Range(0, 10000).foreach { idx =>
+          sum += idx
+        }
+        Thread.sleep(4000)
+        msg(s"another round done: $text")
+      }
+    } catch {
+      case ex: InterruptedException =>
+        msg("still in the process ...")
+    }
+  }
+}
+
+val loop = new Thread(new MessageLoop())
+
+loop.start()
+Thread.sleep(15000)
+loop.interrupt()
+loop.join()
+
+Thread.activeCount
+
+// https://docs.oracle.com/javase/tutorial/essential/concurrency/sync.html

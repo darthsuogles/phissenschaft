@@ -13,7 +13,20 @@ spark_rel_path="spark/spark-${spark_ver}/${spark_tarball}"
 spark_url="${apache_mirror_cgi}?path=${spark_rel_path}"
 
 function spark_home {
-    echo "export SPARK_HOME=${_bsd_}/prebuilt/${spark_dir}"
+    local _spark_home="${_bsd_}/prebuilt/${spark_dir}"
+    echo "export SPARK_HOME=${_spark_home}"
+cat << _PYSPARK_EOF_ > .ipy3
+#!/bin/bash
+export SPARK_HOME="${_spark_home}"
+export PYSPARK_DRIVER_PYTHON=ipython3
+export PYSPARK_DRIVER_PYTHON_OPTS="-i --simple-prompt"
+export PYSPARK_PYTHON=python3
+
+exec ${SPARK_HOME}/bin/pyspark $@
+
+_PYSPARK_EOF_
+
+chmod +x .ipy3
 }
 
 if [[ -d "${_bsd_}/prebuilt/${spark_dir}" ]]; then
