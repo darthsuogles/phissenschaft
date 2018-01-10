@@ -18,3 +18,5 @@ bst <- xgboost(data = train$data,
 
 ## predict
 pred <- predict(bst, test$data)
+
+importance <- xgb.importance(feature_names=colnames(train$data), model = bst)

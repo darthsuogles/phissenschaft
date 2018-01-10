@@ -25,3 +25,6 @@
 [submodule "pkg/spack"]
 	path = pkg/spack
 	url = https://github.com/spack/spack.git
+[submodule "onnx"]
+	path = onnx
+	url = https://github.com/darthsuogles/onnx.git
