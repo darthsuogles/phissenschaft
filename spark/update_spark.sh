@@ -17,12 +17,15 @@ function spark_home {
     echo "export SPARK_HOME=${_spark_home}"
 cat << _PYSPARK_EOF_ > .ipy3
 #!/bin/bash
+
+set -euo pipefail
+
 export SPARK_HOME="${_spark_home}"
 export PYSPARK_DRIVER_PYTHON=ipython3
 export PYSPARK_DRIVER_PYTHON_OPTS="-i --simple-prompt"
 export PYSPARK_PYTHON=python3
 
-exec \${SPARK_HOME}/bin/pyspark $@
+(cd ${_bsd_}; exec \${SPARK_HOME}/bin/pyspark $@)
 
 _PYSPARK_EOF_
 
