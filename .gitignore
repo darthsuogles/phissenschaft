@@ -23,3 +23,6 @@ bazel-*
 *.onnx
 
 spark/prebuilt/
+
+# Dunno
+dlsys/tnsrphlw/
