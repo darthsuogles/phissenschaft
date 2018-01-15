@@ -1,10 +1,10 @@
 #!/bin/bash
 
-set -eu
+set -euo pipefail
 
 _bsd_="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-spark_ver=2.2.0
+spark_ver=2.2.1
 spark_tarball="spark-${spark_ver}-bin-hadoop2.7.tgz"
 spark_dir="${spark_tarball%.*}"
 
@@ -22,7 +22,7 @@ export PYSPARK_DRIVER_PYTHON=ipython3
 export PYSPARK_DRIVER_PYTHON_OPTS="-i --simple-prompt"
 export PYSPARK_PYTHON=python3
 
-exec ${SPARK_HOME}/bin/pyspark $@
+exec \${SPARK_HOME}/bin/pyspark $@
 
 _PYSPARK_EOF_
 
