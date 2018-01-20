@@ -28,3 +28,9 @@
 [submodule "onnx"]
 	path = onnx
 	url = https://github.com/darthsuogles/onnx.git
+[submodule "database/leveldb"]
+	path = database/leveldb
+	url = https://github.com/google/leveldb.git
+[submodule "spark/oss"]
+	path = spark/oss
+	url = https://github.com/apache/spark.git
