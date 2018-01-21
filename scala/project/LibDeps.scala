@@ -4,9 +4,10 @@ import sbt._
 
 object LibVer {
   lazy val scala = "2.11.11"
-  lazy val spark = "2.2.0"
-  lazy val ammonite = "1.0.0"
-  lazy val scalameta = "1.7.0"
+  lazy val spark = "2.2.1"
+  lazy val sparkMaster = "2.4.0-SNAPSHOT"
+  lazy val ammonite = "1.0.3"
+  lazy val scalameta = "2.1.2"
   lazy val akka = "2.4.17"
 }
 
@@ -24,6 +25,14 @@ object LibDeps {
     "akka-slf4j",
     "akka-testkit"
   ) map { "com.typesafe.akka" %% _ % LibVer.akka }
+
+  lazy val spark = Seq(
+    "spark-core",
+    "spark-sql",
+    "spark-streaming",
+    "spark-mllib",
+    "spark-graphx"
+  ).map { "org.apache.spark" %% _ % LibVer.sparkMaster }
 
   lazy val ammonite = Seq(
     "com.lihaoyi" % s"ammonite_${LibVer.scala}" % LibVer.ammonite,
