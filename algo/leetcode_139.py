@@ -5,9 +5,9 @@ class TrieNode(object):
     def __init__(self, is_terminal=False):
         self.is_terminal = is_terminal
         self.children = [None] * 26
-        
+
     def insert(self, s):
-        if not s: 
+        if not s:
             self.is_terminal = True
             return
         i = ord(s[0]) - ord('a')
@@ -45,7 +45,7 @@ def wordBreak(s, wordDict):
     return tbl_match[n-1]
 
 
-print(wordBreak("leetcode", ["leet", "code"]))
+print(wordBreak("leetcodecode", ["leet", "code"]))
 print(wordBreak("leetcode", ["leet", "coder"]))
 
 s = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"

@@ -60,7 +60,7 @@ def getSkyline(buildings):
         # Clear out-of-range overlay layers
         # This way we don't have to remove a particular item
         # It does not remove every out-of-range layer at once.
-        # But we don't really care about
+        # But we don't really care about this
         while x >= hpq[0][1]:
             heapq.heappop(hpq)
         if negH:
