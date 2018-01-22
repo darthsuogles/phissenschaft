@@ -43,3 +43,12 @@
 [submodule "dlsys/cycle-gan-pix2pix"]
 	path = dlsys/cycle-gan-pix2pix
 	url = https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix.git
+[submodule "dlsys/Detectron"]
+	path = dlsys/Detectron
+	url = https://github.com/darthsuogles/Detectron.git
+[submodule "dlsys/caffe2"]
+	path = dlsys/caffe2
+	url = https://github.com/caffe2/caffe2.git
+[submodule "hautperf/libcuckoo"]
+	path = hautperf/libcuckoo
+	url = https://github.com/efficient/libcuckoo.git

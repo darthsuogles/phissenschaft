@@ -1,6 +1,4 @@
 /**
- * FaceBook interview question
- *
  * Parse a linear equation of x
  */
 
