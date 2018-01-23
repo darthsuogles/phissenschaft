@@ -43,3 +43,6 @@
 [submodule "dlsys/cycle-gan-pix2pix"]
 	path = dlsys/cycle-gan-pix2pix
 	url = https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix.git
+[submodule "dlsys/Detectron"]
+	path = dlsys/Detectron
+	url = https://github.com/darthsuogles/Detectron.git
