@@ -46,3 +46,6 @@
 [submodule "dlsys/Detectron"]
 	path = dlsys/Detectron
 	url = https://github.com/darthsuogles/Detectron.git
+[submodule "dlsys/caffe2"]
+	path = dlsys/caffe2
+	url = https://github.com/caffe2/caffe2.git
