@@ -10,7 +10,7 @@ for i, ops in enumerate(_pred[::-1]):
     for op in ops:
         precedence[op] = i
 
-def should_add_op(op_tgt, op_ref):    
+def should_add_op(op_tgt, op_ref):
     if op_ref == '(':
         return True
     prec_tgt = precedence[op_tgt]
@@ -41,7 +41,7 @@ def parse(expr):
             # All the operators with equal or higher precedence
             # shall be evaluated before this
             while op_stack:
-                if should_add_op(ch, op_stack[-1]): 
+                if should_add_op(ch, op_stack[-1]):
                     break
                 op = op_stack.pop()
                 queue.append(op)
@@ -58,7 +58,7 @@ def parse(expr):
                 if '(' == op:
                     break
                 queue.append(op)
-                
+
     if num is not None:
         queue.append(num)
 
@@ -89,3 +89,4 @@ def TEST(expr):
 
 
 TEST('31 + (42 + 1) * 2 ^ 3 ^ 4')
+TEST('2 * 2 + 3 * 4')

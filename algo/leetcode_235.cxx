@@ -3,6 +3,7 @@
  * This implementation provides one for general trees
  */
 #include <iostream>
+#include <cassert>
 #include "TreeNode.hpp"
 
 using namespace std;
@@ -16,7 +17,7 @@ bool find(TreeNode *root, TreeNode *node) {
 // Reverse path to the root
 bool find_path(TreeNode *root, TreeNode *node, vector<TreeNode*> &trail) {
 	if (NULL == root) return false;
-	if (root == node || 
+	if (root == node ||
 		find_path(root->left, node, trail) ||
 		find_path(root->right, node, trail)) {
 		trail.push_back(root); return true;
@@ -24,7 +25,7 @@ bool find_path(TreeNode *root, TreeNode *node, vector<TreeNode*> &trail) {
 	return false;
 }
 
-TreeNode* lowestCommonAncestor(TreeNode *root, TreeNode *p, TreeNode *q) {
+TreeNode* lowestCommonAncestorPathTrace(TreeNode *root, TreeNode *p, TreeNode *q) {
 	vector<TreeNode*> trail_p; find_path(root, p, trail_p);
 	if (trail_p.empty()) return NULL;
 	vector<TreeNode*> trail_q; find_path(root, q, trail_q);
@@ -44,24 +45,39 @@ TreeNode* lowestCommonAncestorBF(TreeNode *root, TreeNode *p, TreeNode *q) {
 	if (root == p) {
 		if (find(root, q)) return root;
 		return NULL;
-	} 
+	}
 	if (root == q) {
 		if (find(root, p)) return root;
 		return NULL;
 	}
-	
+
 	bool lp = find(root->left, p), lq = find(root->left, q);
-	if (lp && lq) return lowestCommonAncestor(root->left, p, q);
+	if (lp && lq) return lowestCommonAncestorPathTrace(root->left, p, q);
 	bool rp = find(root->right, p);
 	if (lq && rp) return root;
 	bool rq = find(root->right, q);
 	if (lp && rq) return root;
-	if (rp && rq) return lowestCommonAncestor(root->right, p, q);
+	if (rp && rq) return lowestCommonAncestorPathTrace(root->right, p, q);
 	return NULL;
 }
 
 
 #define X INT_MIN
+
+// The tree is assumed to be a binary search tree
+TreeNode* lowestCommonAncestor(TreeNode *root, TreeNode *p, TreeNode *q) {
+    if (nullptr == p) return q;
+    if (nullptr == q) return p;
+    if (nullptr == root) return nullptr;
+
+    if (p == root || q == root) return root;
+    if (p->val < root->val && q->val < root->val)
+        return lowestCommonAncestor(root->left, p, q);
+    if (p->val > root->val && q->val > root->val)
+        return lowestCommonAncestor(root->right, p, q);
+    return root;
+}
+
 
 int main() {
 	auto root = TreeNode::from({1, X, 2, 3});

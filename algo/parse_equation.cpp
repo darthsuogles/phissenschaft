@@ -8,15 +8,14 @@
 
 using namespace std;
 
-float solve_equation(string eqn_str)
-{
+float solve_equation(string eqn_str) {
   int len = eqn_str.size();
 
   int idx = 0;
   // Skip the leading spaces
   for (; idx < len; ++idx)
     if ( idx != ' ' ) break;
-  
+
   float a = 0.f, b = 0.f; // a * x = b
   bool is_x = false;
   float lhs = 1.f;
@@ -49,13 +48,13 @@ float solve_equation(string eqn_str)
 	    {
 	      ch = eqn_str[idx];
 	      if ( 'x' != ch )
-		{		
+		{
 		  float val = 0.f;
 		  for (; idx < len; ++idx)
 		    {
 		      ch = eqn_str[idx];
 		      if ( ch < '0' || ch > '9') break;
-		      val = val * 10 + int(ch - '0');	      
+		      val = val * 10 + int(ch - '0');
 		    }
 		  curr *= val;
 		}
@@ -64,12 +63,12 @@ float solve_equation(string eqn_str)
 		  is_x = true;
 		  ++idx;
 		}
-	      
+
 	      // Skip spaces preceeding the next symbol
 	      for (; idx < len; ++idx)
 		if ( eqn_str[idx] != ' ' ) break;
 	      if ( len == idx ) break;
-	      
+
 	      if ( eqn_str[idx] != '*' ) break;
 
 	      // Skip spaces preceeding the next number
@@ -88,7 +87,7 @@ float solve_equation(string eqn_str)
 	  // if ( is_x )
 	  //   cout << ":x";
 	  // cout << endl;
-	  
+
 	  if ( is_x )
 	    a += curr;
 	  else
@@ -104,7 +103,6 @@ float solve_equation(string eqn_str)
     return INT_MIN;
 }
 
-int main()
-{
+int main() {
   cout << solve_equation("1 + 32 + 14 * 2 * x = 22 + 123 + 2 * x + 1") << endl;
 }

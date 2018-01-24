@@ -3,6 +3,30 @@ Asteroid collision
 """
 
 def asteroidCollision(asteroids):
+    """
+    Basically a matching parenthesis problem
+    If however only the surviving velocity is of interest,
+    then we can provide a constant space solution.
+    """
+    res = []
+    for velo in asteroids:
+        if velo >= 0:
+            res.append(velo)
+            continue
+        while res:
+            if res[-1] < 0:
+                break
+            anti = res[-1]
+            if -velo < anti:
+                velo = None; break
+            res.pop()
+            if -velo == anti:
+                velo = None; break
+        if velo is not None:
+            res.append(velo)
+    return res
+
+def asteroidCollisionStack(asteroids):
     res = []
     for v in asteroids:
         if v > 0:
