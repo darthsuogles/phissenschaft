@@ -1,0 +1,1 @@
+../scala/sbt-amm-shell.sh

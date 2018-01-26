@@ -1,11 +1,11 @@
-''' Largest rectangle in histogram 
+''' Largest rectangle in histogram
 '''
 
 def largestRectangleAreaDual(heights):
     if not heights: return 0
     n = len(heights)
     if 1 == n: return heights[0]
-    
+
     def find_min_range(arr):
         stq = [0]
         min_bnd_rhs = [0] * n
@@ -15,7 +15,7 @@ def largestRectangleAreaDual(heights):
                 j = stq[-1]
                 if h >= arr[j]: break
                 min_bnd_rhs[j] = i - 1
-                stq = stq[:-1]
+                stq.pop(-1)
 
             stq.append(i)
 
@@ -43,10 +43,16 @@ def largestRectangleArea(heights):
     heights += [0]  # append 0, so that everything on stack will flush out
     stack = [-1]  # keep in ascending order
     max_area = 0
+    # We keep a stack of ascending heights.
+    # When a new height is encountered, we try to go back and eliminate
+    # all the preceeding heights that are taller. All rectangles need a
+    # minimum height. When a current maximum height is being eliminated,
+    # we know that the largest rectangle where it is the shortest height
+    # can be calculated via the current height and the one before it.
     for i, h in enumerate(heights):
         while stack:
             j = stack[-1]
-            if heights[j] <= h: 
+            if heights[j] <= h:
                 break  # no neg heights, smallest >= 0
             # Update the maximum area whenever we pop element
             stack.pop(); j0 = stack[-1]
@@ -63,4 +69,4 @@ def TEST(heights):
 
 TEST([2,1,1,1,5,5,6,2,3])
 TEST([1,1])
-TEST([2,2,4])    
+TEST([2,2,4])

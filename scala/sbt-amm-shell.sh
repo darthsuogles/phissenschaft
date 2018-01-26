@@ -1,25 +1,31 @@
 #!/bin/bash
 
-set -eu
+set -euo pipefail
 
 OS="$(uname -s | tr [:upper:] [:lower:])"
-if [[ "darwin" == "${OS}" ]]; then
-    which greadlink &>/dev/null || brew install coreutils
-    function tracelink { greadlink -f $@; }
-else
-    function tracelink { readlink -f $@; }
-fi
+case "${OS}" in
+    darwin)
+        which greadlink &>/dev/null || brew install coreutils
+        function tracelink { greadlink -f $@; }
+        ;;
+    linux)
+        function tracelink { readlink -f $@; }
+        ;;
+    \?) >&2 echo "ERROR: unknown OS ${OPTARG}"
+        exit 1
+        ;;
+esac
 
 _bsd_="$(cd "$(dirname "$(tracelink "${BASH_SOURCE[0]}")")" && pwd)"
 
 JAVA_OPTS="-Xmx4G -Xms32M"
 _jvm_agent="${_bsd_}/agent/.agents/mem-inst.jar"
-_opt_interp="${INTERP:-mod}"
+_opt_interp="${INTERP:-spark}"
 
 function java_exec { java ${JAVA_OPTS} -javaagent:"${_jvm_agent}" $@ ; }
 
 # TODO: Ammonite does not pass instrument libraries to the REPL
-# Using the default Ammonite REPL 
+# Using the default Ammonite REPL
 function repl_amm {
     java_exec \
         -cp "$(cat "${_bsd_}/repl/SBT_RUNTIME_CLASSPATH")" \
@@ -35,6 +41,14 @@ function repl_mod {
          $@
 }
 
+# Using our customized Ammonite based REPL + Spark
+function repl_spark_mod {
+    java_exec \
+         -cp "$(cat "${_bsd_}/.srepl/SBT_RUNTIME_CLASSPATH")" \
+         y.phi9t.repl.ReplMain \
+         $@
+}
+
 # Using standard Scala REPL
 function repl_scala {
     java_exec \
@@ -44,8 +58,9 @@ function repl_scala {
         $@
 }
 
-case "${_opt_interp}" in 
+case "${_opt_interp}" in
     mod) repl_mod ;;
     amm) repl_amm ;;
+    spark) repl_spark_mod ;;
     scala) repl_scala ;;
 esac

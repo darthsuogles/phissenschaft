@@ -1,0 +1,33 @@
+
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{functions => F}
+
+// Spark discussions: https://www.zhihu.com/topic/19942170/hot
+implicit val spark = {
+  // http://spark.apache.org/docs/latest/configuration.html
+  val sess = SparkSession.builder()
+    .master("local[2]")
+    .appName("phi9t")
+    .getOrCreate()
+  sess.sparkContext.setLogLevel("ERROR")
+  sess
+}
+
+
+// For implicit conversions like converting RDDs to DataFrames
+import spark.implicits._
+
+//import $ivy.`com.google.protobuf:protobuf-java:3.1.0`
+import $exec.DevSerDe, FPath.implicits._
+
+val dataRoot = FPath.home / "local" / "data"
+
+val dfOrig = { spark
+  .read
+  .option("header", "true")
+  .csv(dataRoot / "redditSubmissions.csv.gz")
+}.cache
+
+// https://spark.apache.org/docs/latest/api/scala/index.html#org.apache.spark.sql.functions$
+val df = dfOrig.withColumn("time", F.from_unixtime($"unixtime"))
+val dfAgg = df.select("time").groupBy("time").agg(F.count("*").as("count")).where($"count" > 1)

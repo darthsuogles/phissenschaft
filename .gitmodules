@@ -34,3 +34,24 @@
 [submodule "dlsys/tensor2tensor"]
 	path = dlsys/tensor2tensor
 	url = https://github.com/tensorflow/tensor2tensor.git
+[submodule "database/leveldb"]
+	path = database/leveldb
+	url = https://github.com/google/leveldb.git
+[submodule "spark/oss"]
+	path = spark/oss
+	url = https://github.com/apache/spark.git
+[submodule "spark/graphframes"]
+	path = spark/graphframes
+	url = https://github.com/darthsuogles/graphframes
+[submodule "dlsys/improved_wgan_training"]
+	path = dlsys/improved_wgan_training
+	url = https://github.com/darthsuogles/improved_wgan_training
+[submodule "dlsys/cycle-gan-pix2pix"]
+	path = dlsys/cycle-gan-pix2pix
+	url = https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix.git
+[submodule "dlsys/Detectron"]
+	path = dlsys/Detectron
+	url = https://github.com/darthsuogles/Detectron.git
+[submodule "dlsys/caffe2"]
+	path = dlsys/caffe2
+	url = https://github.com/caffe2/caffe2.git

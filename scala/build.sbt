@@ -22,7 +22,7 @@ lazy val root = (project in file(".")).
   settings(
     name := "root",
     publishArtifact := false
-  ).aggregate(repl, agent)
+  ).aggregate(srepl, repl, agent)
 
 lazy val core = (project in file("core")).
   settings(commonSettings: _*).
@@ -30,6 +30,13 @@ lazy val core = (project in file("core")).
     name := "core",
     publishArtifact := false
   ).aggregate(repl)
+
+lazy val srepl = (project in file(".srepl"))
+  .settings(commonSettings: _*)
+  .settings(
+    name := "srepl",
+    libraryDependencies ++= LibDeps.spark
+  ).aggregate(repl).dependsOn(repl)
 
 lazy val repl = (project in file("repl")).
   settings(commonSettings: _*).
