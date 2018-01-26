@@ -31,3 +31,6 @@
 [submodule "onnx"]
 	path = onnx
 	url = https://github.com/darthsuogles/onnx.git
+[submodule "dlsys/tensor2tensor"]
+	path = dlsys/tensor2tensor
+	url = https://github.com/tensorflow/tensor2tensor.git
