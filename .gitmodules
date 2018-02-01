@@ -52,3 +52,6 @@
 [submodule "hautperf/libcuckoo"]
 	path = hautperf/libcuckoo
 	url = https://github.com/efficient/libcuckoo.git
+[submodule "dlsys/autograd"]
+	path = dlsys/autograd
+	url = https://github.com/darthsuogles/autograd.git
