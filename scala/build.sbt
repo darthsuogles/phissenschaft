@@ -31,6 +31,9 @@ lazy val core = (project in file("core")).
     publishArtifact := false
   ).aggregate(repl)
 
+// Third party tools
+lazy val scio = (project in file("scio"))
+
 lazy val srepl = (project in file(".srepl"))
   .settings(commonSettings: _*)
   .settings(

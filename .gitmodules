@@ -55,3 +55,6 @@
 [submodule "dlsys/autograd"]
 	path = dlsys/autograd
 	url = https://github.com/darthsuogles/autograd.git
+[submodule "scala/scio"]
+	path = scala/scio
+	url = https://github.com/darthsuogles/scio.git

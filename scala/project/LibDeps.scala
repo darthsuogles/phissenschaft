@@ -4,11 +4,14 @@ import sbt._
 
 object LibVer {
   lazy val scala = "2.11.11"
-  lazy val spark = "2.2.1"
-  lazy val sparkMaster = "2.4.0-SNAPSHOT"
   lazy val ammonite = "1.0.3"
   lazy val scalameta = "2.1.2"
-  lazy val akka = "2.4.17"
+  // Spark
+  lazy val spark = "2.2.1"
+  lazy val sparkMaster = "2.4.0-SNAPSHOT"
+  // Akka: https://github.com/akka/akka/releases
+  lazy val akka = "2.5.9"
+  // BEAM via Scio
 }
 
 object LibDeps {
