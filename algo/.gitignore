@@ -1,0 +1,14 @@
+*~
+*.pyc
+*.out
+.DS_Store
+
+*.pdf
+*.log
+*_pr_comments.csv
+
+*.dSYM
+*.dSYM/
+
+input*.txt
+output*.txt

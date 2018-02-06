@@ -55,3 +55,9 @@
 [submodule "dlsys/caffe2"]
 	path = dlsys/caffe2
 	url = https://github.com/caffe2/caffe2.git
+[submodule "hautperf/libcuckoo"]
+	path = hautperf/libcuckoo
+	url = https://github.com/efficient/libcuckoo.git
+[submodule "dlsys/autograd"]
+	path = dlsys/autograd
+	url = https://github.com/darthsuogles/autograd.git

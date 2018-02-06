@@ -1,7 +1,3 @@
-/**
- * Facebook interview question
- */
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -13,10 +9,10 @@ int num_interpretations(string codes)
 {
   if ( codes.empty() ) return 0;
   int len = codes.size();
-  
+
   int cnt = 0;
-  
-  // First digit  
+
+  // First digit
   char ch = codes[0];
   if ( ch >= '1' && ch <= '9' )
     {
@@ -28,7 +24,7 @@ int num_interpretations(string codes)
     }
   if ( 1 == len )
     return cnt;
-      
+
   // First two digits
   int val = 0;
   for (int i = 0; i < 2; ++i)
@@ -43,7 +39,7 @@ int num_interpretations(string codes)
     {
       if ( 2 == len )
 	return cnt + 1;
-      
+
       // Right shift by two
       string next_codes = codes.substr(2, len-2);
       cnt += num_interpretations(next_codes);
@@ -56,7 +52,7 @@ int num_interpretations_nonrec(string codes)
 {
   if ( codes.empty() ) return 0;
 
-  int len = codes.size();  
+  int len = codes.size();
   //vector<int> tbl(len, 0);
   int tbl[2] = {0};
   for (int i = len-1; i >= 0; --i)
@@ -64,7 +60,7 @@ int num_interpretations_nonrec(string codes)
       int cnt = 0;
       int val = 0;
 
-      char ch = codes[i];	    
+      char ch = codes[i];
       if ( '1' <= ch && ch <= '9' )
 	{
 	  val = int(ch - '0');
@@ -89,7 +85,7 @@ int num_interpretations_nonrec(string codes)
 		}
 	    }
 	}
-      
+
       //tbl[i] = cnt;
       tbl[1] = tbl[0];
       tbl[0] = cnt;

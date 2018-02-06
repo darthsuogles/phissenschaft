@@ -1,7 +1,3 @@
-/**
- * Facebook interview question
- */
-
 #include <iostream>
 
 using namespace std;
