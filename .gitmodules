@@ -31,6 +31,15 @@
 [submodule "database/leveldb"]
 	path = database/leveldb
 	url = https://github.com/google/leveldb.git
+[submodule "database/highwayhash"]
+    path = database/highwayhash
+    url = https://github.com/google/highwayhash.git
+[submodule "database/peloton"]
+    path = database/peloton
+    url = https://github.com/cmu-db/peloton.git
+[submodule "database/siphash-avx2"]
+    path = database/siphash-avx2
+    url = https://github.com/jedisct1/siphash-avx2.git
 [submodule "spark/oss"]
 	path = spark/oss
 	url = https://github.com/apache/spark.git
@@ -58,3 +67,7 @@
 [submodule "scala/scio"]
 	path = scala/scio
 	url = https://github.com/darthsuogles/scio.git
+[submodule "scala/Ammonite"]
+	path = scala/Ammonite
+	url = https://github.com/darthsuogles/Ammonite.git
+e

@@ -22,7 +22,7 @@ lazy val root = (project in file(".")).
   settings(
     name := "root",
     publishArtifact := false
-  ).aggregate(srepl, repl, agent)
+  ).aggregate(sparkRepl, scioRepl, repl, agent)
 
 lazy val core = (project in file("core")).
   settings(commonSettings: _*).
@@ -33,13 +33,32 @@ lazy val core = (project in file("core")).
 
 // Third party tools
 lazy val scio = (project in file("scio"))
+  .settings(
+    name := "scio",
+    scalaVersion := LibVer.scala_2_12,
+    dependencyOverrides ++= Seq(
+      "io.grpc" %% "grpc-core" % "1.6.1"
+    )
+  )
 
-lazy val srepl = (project in file(".srepl"))
+lazy val sparkRepl = (project in file(".spark.repl"))
   .settings(commonSettings: _*)
   .settings(
     name := "srepl",
     libraryDependencies ++= LibDeps.spark
   ).aggregate(repl).dependsOn(repl)
+
+// http://www.scala-sbt.org/1.x/docs/Library-Management.html#Overriding+a+version
+lazy val scioRepl = (project in file(".scio.repl"))
+  .settings(
+    name := "scio-repl",
+    scalaVersion := LibVer.scala_2_12,
+    dependencyOverrides ++= Seq(
+      "io.grpc" %% "grpc-core" % "1.6.1"
+    )
+  ).aggregate(scio, ammonite).dependsOn(scio, ammonite)
+
+lazy val ammonite = (project in file("ammonite"))
 
 lazy val repl = (project in file("repl")).
   settings(commonSettings: _*).
