@@ -71,3 +71,6 @@
 	path = scala/Ammonite
 	url = https://github.com/darthsuogles/Ammonite.git
 e
+[submodule "hautperf/cpu_features"]
+	path = hautperf/cpu_features
+	url = https://github.com/google/cpu_features.git
