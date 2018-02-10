@@ -74,3 +74,6 @@ e
 [submodule "hautperf/cpu_features"]
 	path = hautperf/cpu_features
 	url = https://github.com/google/cpu_features.git
+[submodule "pixsrl/pbrt-v3"]
+	path = pixsrl/pbrt-v3
+	url = https://github.com/mmp/pbrt-v3.git
