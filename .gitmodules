@@ -76,3 +76,9 @@
 [submodule "scala/Ammonite"]
 	path = scala/Ammonite
 	url = https://github.com/darthsuogles/Ammonite.git
+[submodule "hautperf/cpu_features"]
+	path = hautperf/cpu_features
+	url = https://github.com/google/cpu_features.git
+[submodule "pixsrl/pbrt-v3"]
+	path = pixsrl/pbrt-v3
+	url = https://github.com/mmp/pbrt-v3.git
