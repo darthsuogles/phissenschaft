@@ -51,7 +51,7 @@
 	url = https://github.com/darthsuogles/improved_wgan_training
 [submodule "dlsys/cycle-gan-pix2pix"]
 	path = dlsys/cycle-gan-pix2pix
-	url = https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix.git
+    url = https://github.com/darthsuogles/pytorch-CycleGAN-and-pix2pix.git
 [submodule "dlsys/Detectron"]
 	path = dlsys/Detectron
 	url = https://github.com/darthsuogles/Detectron.git
@@ -70,10 +70,12 @@
 [submodule "scala/Ammonite"]
 	path = scala/Ammonite
 	url = https://github.com/darthsuogles/Ammonite.git
-e
 [submodule "hautperf/cpu_features"]
 	path = hautperf/cpu_features
 	url = https://github.com/google/cpu_features.git
 [submodule "pixsrl/pbrt-v3"]
 	path = pixsrl/pbrt-v3
 	url = https://github.com/mmp/pbrt-v3.git
+[submodule "dlsys/auto_ml_enas"]
+	path = dlsys/auto_ml_enas
+	url = https://github.com/carpedm20/ENAS-pytorch.git
