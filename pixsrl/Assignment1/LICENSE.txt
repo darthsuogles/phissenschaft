@@ -1,0 +1,3 @@
+Realistic head model (geometry/head.ply and textures/head_albedomap.png): thanks to Infinite Realities, Inc., CC-BY license; https://creativecommons.org/licenses/by/2.0/ 
+
+Environment map thanks to USC-ICT light probe image gallery (http://gl.ict.usc.edu/Data/HighResProbes/).
