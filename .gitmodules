@@ -22,12 +22,18 @@
 [submodule "dlsys/PytorchWCT"]
 	path = dlsys/PytorchWCT
 	url = https://github.com/sunshineatnoon/PytorchWCT.git
+[submodule "dlsys/tnsrphlw_ex"]
+	path = dlsys/tnsrphlw_ex
+	url = https://github.com/tensorflow/models.git
 [submodule "pkg/spack"]
 	path = pkg/spack
 	url = https://github.com/spack/spack.git
 [submodule "onnx"]
 	path = onnx
 	url = https://github.com/darthsuogles/onnx.git
+[submodule "dlsys/tensor2tensor"]
+	path = dlsys/tensor2tensor
+	url = https://github.com/tensorflow/tensor2tensor.git
 [submodule "database/leveldb"]
 	path = database/leveldb
 	url = https://github.com/google/leveldb.git
