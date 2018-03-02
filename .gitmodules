@@ -76,3 +76,6 @@
 [submodule "pixsrl/pbrt-v3"]
 	path = pixsrl/pbrt-v3
 	url = https://github.com/mmp/pbrt-v3.git
+[submodule "dlsys/mxnet"]
+	path = dlsys/mxnet
+	url = https://github.com/darthsuogles/mxnet.git
