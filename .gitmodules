@@ -88,3 +88,6 @@
 [submodule "dlsys/auto_ml_enas"]
 	path = dlsys/auto_ml_enas
 	url = https://github.com/carpedm20/ENAS-pytorch.git
+[submodule "natlang/fastText"]
+	path = natlang/fastText
+	url = https://github.com/facebookresearch/fastText.git
