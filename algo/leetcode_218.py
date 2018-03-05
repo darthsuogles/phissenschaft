@@ -2,17 +2,20 @@
 The skyline problem
 """
 
-def getSkylineOne(buildings):
+def getSkylineArea(buildings):
     if not buildings: return []
     # building: [left_pos, right_pos, height]
     from collections import namedtuple
-    ChangePoint = namedtuple("ChangePoint", ['x', 'init', 'h'])
+    ChangePoint = namedtuple("ChangePoint", ['x', 'init', 'neg_h'])
 
     change_pts = []
     for p0, p1, h in buildings:
-        change_pts.append(ChangePoint(x=p0, init=True, h=h))
-        change_pts.append(ChangePoint(x=p1, init=False, h=h))
+        change_pts.append(ChangePoint(x=p0, init=0, neg_h=-h))
+        change_pts.append(ChangePoint(x=p1, init=1, neg_h=-h))
 
+    # If two change points have the same `x` location, we want
+    # the one that is an initial point to go first. If both
+    # are initial points, the one that's tallest should win.
     change_pts = sorted(change_pts, key=lambda pt: pt.x)
 
     # Store the overlay buildings
@@ -50,39 +53,45 @@ def getSkylineOne(buildings):
 def getSkyline(buildings):
     import heapq
     # heapq implements min-heap, thus need `negH`
-    events = sorted([(L, -H, R) for L, R, H in buildings]
-                    + list(set((R, 0, None) for _, R, _ in buildings)))
+    events = sorted([(x0, -y, x1) for x0, x1, y in buildings]
+                    + list(set((x1, 0, None) for _, x1, _ in buildings)))
 
     # Add sentinels to simplify boundary condition checking
-    res, hpq = [[0, 0]], [(0, float("inf"))]  # infinite horizon
+    res = [[0, 0]]
+    hpq = [(0, float("inf"))]  # infinite horizon
     area = 0
-    for x, negH, R in events:
+    for x0, neg_y, x1 in events:
         # Clear out-of-range overlay layers
         # This way we don't have to remove a particular item
         # It does not remove every out-of-range layer at once.
         # But we don't really care about this
-        while x >= hpq[0][1]:
+        while x0 >= hpq[0][1]:
             heapq.heappop(hpq)
-        if negH:
-            heapq.heappush(hpq, (negH, R))
 
-        # Check if mergeable: previous
-        h_next = -hpq[0][0]
-        x_prev, h_prev = res[-1]
-        if h_next != h_prev:
-            res += [x, h_next],
-            area += (x - x_prev) * h_prev
+        # Only add a new one if it has a real height.
+        # The falling cliffs are annoted with height = 0.
+        if neg_y < 0:
+            heapq.heappush(hpq, (neg_y, x1))
+
+        # See if we need a new line segment in the resulting skyline.
+        # Either the current event is subsumed by the tallest at
+        # the moment or that we may have adjacent buildings with
+        # the same heights.
+        y_curr = -hpq[0][0]
+        x_prev, y_prev = res[-1]
+        if y_curr != y_prev:
+            res += [x0, y_curr],
+            area += (x0 - x_prev) * y_curr
 
     return res[1:]
 
 
-def TEST(buildings):
-    print(getSkyline(buildings))
+def TEST(buildings, tgt_pts):
+    res_pts = getSkyline(buildings)
+    assert res_pts == tgt_pts
+    print('PASS')
 
-TEST([[2, 9, 10],
-      [3, 7, 15],
-      [5, 12, 12],
-      [15, 20, 10],
-      [19, 24, 8]])
+TEST([[2, 9, 10], [3, 7, 15], [5, 12, 12], [15, 20, 10], [19, 24, 8]],
+     [[2, 10], [3, 15], [7, 12], [12, 0], [15, 10], [20, 8], [24, 0]])
 
-TEST([[0,2,3],[2,5,3]])
+TEST([[0,2,3],[2,5,3]], [[0, 3], [5, 0]])

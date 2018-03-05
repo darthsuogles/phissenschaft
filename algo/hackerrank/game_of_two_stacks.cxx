@@ -2,15 +2,11 @@
 #include <algorithm>
 #include <iostream>
 #include <cassert>
-<<<<<<< HEAD
 #include <stack>
-=======
->>>>>>> a292468... daily checkup
 #include <iterator>
 
 using namespace std;
 
-<<<<<<< HEAD
 void linear_search() {
     int g; cin >> g;
     using integer = long long;
@@ -52,9 +48,6 @@ void linear_search() {
 }
 
 void prefix_array_binary_search() {
-=======
-int main() {
->>>>>>> a292468... daily checkup
     int g; cin >> g; // number of games
     using integer = long long;
     for (int game = 0; game < g; ++game) {
@@ -95,10 +88,7 @@ int main() {
         cout << max_val << endl;
     }
 }
-<<<<<<< HEAD
 
 int main() {
     linear_search();
 }
-=======
->>>>>>> a292468... daily checkup

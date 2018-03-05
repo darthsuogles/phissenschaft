@@ -34,11 +34,11 @@ def triangleNumberBS(nums):
             # Do a binary search (bisect_right)
             i, j = p + 1, q
             while i < j:
-                k = (i + j) // 2
-                if nums[k] <= tgt:
-                    i = k + 1
-                else:
+                k = i + (j - i) // 2
+                if tgt < nums[k]:
                     j = k
+                else:
+                    i = k + 1
 
             # Now, index i points to the position of the first desired value
             # From there till the one before position q, the values will help
@@ -58,13 +58,21 @@ def triangleNumber(nums):
         if a < 1: continue
         k = i + 2
         for j in range(i + 1, N - 1):
-            up_bnd = a + nums[j]
+            small_sides_sum = a + nums[j]
             while k < N:
-                if nums[k] >= up_bnd:
+                if nums[k] >= small_sides_sum:
                     break
                 k += 1
+
+            # For the choice i, j, these are the
+            # number of elements we can choose as
+            # the largest side
             m = k - j - 1
             cnts += m
+
+            # Choosing any two of the remaining
+            # batch as side will result in a valid
+            # triangle, thus adding all combinations.
             if k == N:
                 cnts += m * (m - 1) // 2
                 break
@@ -74,7 +82,7 @@ def triangleNumber(nums):
 
 def TEST(nums):
     ref = triangleNumberRef(nums)
-    tgt = triangleNumber(nums)
+    tgt = triangleNumberBS(nums)
     print('ref', ref, 'tgt', tgt)
 
 print('-------TEST-CASES--------')
