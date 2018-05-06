@@ -52,48 +52,50 @@
 	   y = d3.scaleLinear().range([height, 0]);
 
    // Get some data
-   var data = [{x: -1, y: -1, text: "abc"},
-			   {x: -1, y: +1, text: "bdc"},
-			   {x: +1, y: -1, text: "efg"},
-			   {x: +1, y: +1, text: "gge"},];
+   /* var data = [{x: -1, y: -1, text: "abc"},
+	  {x: -1, y: +1, text: "bdc"},
+	  {x: +1, y: -1, text: "efg"},
+	  {x: +1, y: +1, text: "gge"},];*/
 
-   // Adjust the axis
-   x.domain(d3.extent(data, function (d) { return d.x; }));
-   y.domain(d3.extent(data, function (d) { return d.y; }));
+   d3.csv("docs_tsne2d.csv", function (error, data) {
+	 // Adjust the axis
+	 x.domain(d3.extent(data, function (d) { return d.x; }));
+	 y.domain(d3.extent(data, function (d) { return d.y; }));
 
-   // Render the data
-   svg.selectAll("dot")
-	  .data(data)
-	  .enter().append("circle")
-      .attr("class", "dotContext")
-	  .attr("r", 5)
-	  .attr("cx", function (d) { return x(d.x); })
-	  .attr("cy", function (d) { return y(d.y); })
-	  .on("mouseover", function (d) {
-		// Smooth the transition with animation
-		div.transition()
-		   .duration(300)
-		   .style("opacity", .9);
-		// Add text and change to mouse location
-		div.html(d.text)
-		   .style("left", (d3.event.pageX) + "px")
-		   .style("top", (d3.event.pageY - 28) + "px");
-	  })
-	  .on("mouseout", function (d) {
-		div.transition()
-		   .duration(700)
-		   .style("opacity", 0);
-	  })
-	  .attr("opacity", .75);
+	 // Render the data
+	 svg.selectAll("dot")
+		.data(data)
+		.enter().append("circle")
+		.attr("class", "dotContext")
+		.attr("r", 5)
+		.attr("cx", function (d) { return x(d.x); })
+		.attr("cy", function (d) { return y(d.y); })
+		.on("mouseover", function (d) {
+		  // Smooth the transition with animation
+		  div.transition()
+			 .duration(300)
+			 .style("opacity", .9);
+		  // Add text and change to mouse location
+		  div.html(d.text)
+			 .style("left", (d3.event.pageX) + "px")
+			 .style("top", (d3.event.pageY - 28) + "px");
+		})
+		.on("mouseout", function (d) {
+		  div.transition()
+			 .duration(700)
+			 .style("opacity", 0);
+		})
+		.attr("opacity", .75);
 
-   svg.append("g")
-	  .attr("class", "axis axis--x")
-	  .attr("transform", "translate(0," + height + ")")
-	  .call(d3.axisBottom(x));
+	 svg.append("g")
+		.attr("class", "axis axis--x")
+		.attr("transform", "translate(0," + height + ")")
+		.call(d3.axisBottom(x));
 
-   svg.append("g")
-      .attr("class", "axis axis--y")
-	  .call(d3.axisLeft(y));
+	 svg.append("g")
+		.attr("class", "axis axis--y")
+		.call(d3.axisLeft(y));
+   });
 
   </script>
 

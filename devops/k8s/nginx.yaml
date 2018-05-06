@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-salut
+spec:
+  containers:
+  - name: nginx-salut
+    image: nginx:1.7.9
+    ports:
+    - containerPort: 80

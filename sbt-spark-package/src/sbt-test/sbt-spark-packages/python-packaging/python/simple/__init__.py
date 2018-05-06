@@ -1,2 +1,0 @@
-# init script
-print "init"
