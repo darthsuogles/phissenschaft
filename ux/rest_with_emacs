@@ -5,3 +5,8 @@
 #
 GET https://api.github.com
 User-Agent: Emacs Restclient
+
+#
+# It can even show an image!
+#
+GET http://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png

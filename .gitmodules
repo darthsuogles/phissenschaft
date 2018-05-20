@@ -79,3 +79,9 @@
 [submodule "natlang/fastText"]
 	path = natlang/fastText
 	url = https://github.com/facebookresearch/fastText.git
+[submodule "devops/kubespray"]
+	path = devops/kubespray
+	url = https://github.com/kubernetes-incubator/kubespray.git
+[submodule "third_party/bazel/rules_python"]
+	path = third_party/bazel/rules_python
+	url = https://github.com/bazelbuild/rules_python.git
