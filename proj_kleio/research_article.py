@@ -137,7 +137,7 @@ class Article(object):
         title = meta_fields['title']
         custom_id = self.gen_custom_id( meta_fields )
 
-        print("*** [{}][file:papers/{}.pdf]".format(title, custom_id))
+        print("*** [[file:papers/{custom_id}.pdf][{title}]]".format(title=title, custom_id=custom_id))
         print('    :PROPERTIES:')
         # Begin printing in orgmode conforming format
         print('    :CUSTOM_ID: {}'.format(custom_id))
