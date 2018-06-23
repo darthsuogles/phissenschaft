@@ -5,6 +5,7 @@
 #include <vector>
 #include <utility>
 #include <cassert>
+#include <climits>
 #include <queue>
 #include <algorithm>
 #include <tuple>
@@ -43,31 +44,33 @@ public:
                 tall_overlay.pop();
             }
 
-            if (-1 != where_ends) {
-                tall_overlay.push(make_pair(height, where_ends));
-            }
+            if (-1 != where_ends) tall_overlay.push(make_pair(height, where_ends));
+
             int top_height = tall_overlay.empty() ? 0 : get<0>(tall_overlay.top());
 
-            if (top_height > height)
-                continue;
+            if (top_height > height) continue;
+
             auto mark = make_pair(pos, top_height);
             // Insert if we haven't collected any results
             if (landmarks.empty()) {
                 landmarks.push_back(mark); continue;
             }
             // If previous landmark has an overlapping position, we know it is
-            // gonna be shorter, thus remove it
-            int prev_pos = get<0>(landmarks[landmarks.size() - 1]);
-            if (prev_pos == pos)
-                landmarks.pop_back();
+            // gonna be shorter, thus remove it. Why do we know this? Well,
+			// all the event with the same position will be in a consecutive chunk.
+			// Our current `mark` has a height no shorter than the previously
+			// recoreded one, since we will only add new overlay when processing
+			// the said chunk. Thus it is safe to replace the existing one with
+			// the new one.
+            int prev_pos = get<0>(landmarks.back());
+            if (prev_pos == pos) landmarks.pop_back();
             if (landmarks.empty()) {
                 landmarks.push_back(mark); continue;
             }
             // If the previous landmark has the same height, then we
             // won't bother adding this new one
-            int prev_height = get<1>(landmarks[landmarks.size() - 1]);
-            if (prev_height != top_height)
-                landmarks.push_back(mark);
+            int prev_height = get<1>(landmarks.back());
+            if (prev_height != top_height) landmarks.push_back(mark);
         }
         return landmarks;
     }
