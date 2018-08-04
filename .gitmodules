@@ -85,3 +85,6 @@
 [submodule "third_party/tvm"]
 	path = third_party/tvm
 	url = https://github.com/dmlc/tvm.git
+[submodule "proj_kleio/distill"]
+	path = proj_kleio/distill
+	url = https://github.com/distillpub/template.git
