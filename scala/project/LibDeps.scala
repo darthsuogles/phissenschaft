@@ -4,16 +4,17 @@ import sbt._
 
 object LibVer {
   lazy val scala = scala_2_11
-  lazy val scala_2_11 = "2.11.11"
+  lazy val scala_2_11 = "2.11.12"
   lazy val scala_2_12 = "2.12.4"
 
-  lazy val ammonite = "1.0.3"
-  lazy val ammonite_2_12 = "1.0.3-33-2d70b25"
+  lazy val ammonite = "1.1.0"
+  lazy val ammonite_2_11 = "1.1.0-3-73d5734"
+  lazy val ammonite_2_12 = "1.1.0-3-73d5734"
 
-  lazy val scalameta = "3.0.0"
-  lazy val scalameta_2_12 = "3.0.0"
+  lazy val scalameta = "3.6.0"
+  lazy val scalameta_2_12 = "3.6.0"
   // Spark
-  lazy val spark = "2.2.1"
+  lazy val spark = "2.3.0"
   lazy val sparkMaster = "2.4.0-SNAPSHOT"
   // Akka: https://github.com/akka/akka/releases
   lazy val akka = "2.5.9"
@@ -35,13 +36,17 @@ object LibDeps {
     "akka-testkit"
   ) map { "com.typesafe.akka" %% _ % LibVer.akka }
 
-  lazy val spark = Seq(
+  private lazy val sparkModules = Seq(
     "spark-core",
     "spark-sql",
     "spark-streaming",
     "spark-mllib",
     "spark-graphx"
-  ).map { "org.apache.spark" %% _ % LibVer.sparkMaster }
+  )
+  lazy val sparkMaster = sparkModules.map {
+    "org.apache.spark" %% _ % LibVer.sparkMaster }
+  lazy val spark = sparkModules.map {
+    "org.apache.spark" %% _ % LibVer.spark }
 
   lazy val ammonite = Seq(
     "com.lihaoyi" % s"ammonite_${LibVer.scala}" % LibVer.ammonite,

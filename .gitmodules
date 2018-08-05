@@ -88,3 +88,18 @@
 [submodule "proj_kleio/distill"]
 	path = proj_kleio/distill
 	url = https://github.com/distillpub/template.git
+[submodule "pixsrl/yotsuba"]
+	path = pixsrl/yotsuba
+	url = https://github.com/aekul/yotsuba
+[submodule "pixsrl/aether"]
+	path = pixsrl/aether
+	url = https://github.com/aekul/aether.git
+[submodule "pixsrl/mitsuba"]
+	path = pixsrl/mitsuba
+	url = https://github.com/mitsuba-renderer/mitsuba
+[submodule "dlsys/keras"]
+	path = dlsys/keras
+	url = https://github.com/darthsuogles/keras.git
+[submodule "pixsrl/opengl/docker-ubuntu-vnc-desktop"]
+	path = pixsrl/opengl/docker-ubuntu-vnc-desktop
+	url = https://github.com/darthsuogles/docker-ubuntu-vnc-desktop.git
