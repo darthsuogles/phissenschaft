@@ -100,3 +100,8 @@ local_repository(
     name = "ignored_spark",
     path = "./spark",
 )
+
+local_repository(
+    name = "natlang_sling",
+    path = "./natlang/sling",
+)
