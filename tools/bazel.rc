@@ -1,0 +1,24 @@
+
+# For projects which use TensorFlow as part of a Bazel build process, putting
+# nothing in a bazelrc will default to a monolithic build. The following line
+# opts in to modular op registration support by default.
+build --define framework_shared_object=true
+
+build --define=use_fast_cpp_protos=true
+build --define=allow_oversize_protos=true
+build --define=grpc_no_ares=true
+
+build --spawn_strategy=standalone
+build --genrule_strategy=standalone
+build -c opt
+
+# Modular TF build options
+build:dynamic_kernels --define=dynamic_loaded_kernels=true
+
+# build with profiling
+build:cpu_prof --linkopt=-lprofiler
+
+# Enable C++14
+# build --cxxopt="-std=c++14"
+# Enable colorful output of GCC
+# build --cxxopt="-fdiagnostics-color=always"
