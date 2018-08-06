@@ -100,3 +100,13 @@ local_repository(
     name = "ignored_spark",
     path = "./spark",
 )
+
+local_repository(
+    name = "natlang_sling",
+    path = "./natlang/sling",
+)
+
+local_repository(
+    name = "golang_bazel_buildtools",
+    path = "./lang/go/src/github.com/bazelbuild/buildtools",
+)
