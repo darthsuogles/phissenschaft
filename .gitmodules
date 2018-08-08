@@ -100,3 +100,9 @@
 [submodule "pixsrl/opengl/docker-ubuntu-vnc-desktop"]
 	path = pixsrl/opengl/docker-ubuntu-vnc-desktop
 	url = https://github.com/darthsuogles/docker-ubuntu-vnc-desktop.git
+[submodule "third_party/abseil-cpp"]
+	path = third_party/abseil-cpp
+	url = https://github.com/abseil/abseil-cpp.git
+[submodule "third_party/grpc"]
+	path = third_party/grpc
+	url = https://github.com/grpc/grpc.git

@@ -101,6 +101,7 @@ local_repository(
     path = "./spark",
 )
 
+# Simply providing some directories as external files
 local_repository(
     name = "natlang_sling",
     path = "./natlang/sling",
