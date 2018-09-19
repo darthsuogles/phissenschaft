@@ -1,5 +1,6 @@
 #+TITLE: Experimenting C++ Code in Babel
 
+https://orgmode.org/worg/org-contrib/babel/intro.html
 
 #+BEGIN_SRC C++ :includes <iostream>
   std::cout << "salut tout le monde" << std::endl;
@@ -18,3 +19,29 @@
 
 #+RESULTS:
 : 1 13 15 21 21 32 37 87
+
+#+BEGIN_SRC C++ :includes <folly/FBVector.h> <iostream> <cassert> :flags "-std=c++14" :libs "/usr/local/Cellar/jemalloc/5.1.0/lib/libjemalloc.a"
+  folly::fbvector<int> numbers({0, 1, 2, 3});
+  numbers.reserve(10);
+  for (int i = 4; i < 10; i++) {
+    numbers.push_back(i * 2);
+  }
+  //assert(numbers[6] == 12);
+  for (auto val: numbers) std::cout << val << " ";
+  std::cout << std::endl;
+  std::cout << numbers.size() << std::endl;
+#+END_SRC
+
+#+RESULTS:
+
+
+#+BEGIN_SRC rust
+  for count in 0..3 {
+        println!("{} salut tout le monde!", count);
+  }
+#+END_SRC
+
+#+RESULTS:
+: 0 salut tout le monde!
+: 1 salut tout le monde!
+: 2 salut tout le monde!
