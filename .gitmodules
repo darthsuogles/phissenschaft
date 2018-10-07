@@ -106,3 +106,12 @@
 [submodule "third_party/grpc"]
 	path = third_party/grpc
 	url = https://github.com/grpc/grpc.git
+[submodule "third_party/serving"]
+	path = third_party/serving
+	url = https://github.com/tensorflow/serving.git
+[submodule "third_party/tensorflow_models"]
+	path = third_party/tensorflow_models
+	url = https://github.com/tensorflow/models.git
+[submodule "third_party/detectron"]
+	path = third_party/detectron
+	url = https://github.com/facebookresearch/Detectron.git

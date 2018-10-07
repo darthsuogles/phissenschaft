@@ -90,6 +90,17 @@ go_register_toolchains()
 
 buildifier_dependencies()
 
+# Protocol buffer
+git_repository(
+    name = "org_pubref_rules_protobuf",
+    commit = "5cae42382b620aa1e347ecf30b3e92fd0d97998c",
+    remote = "https://github.com/pubref/rules_protobuf",
+)
+
+load("@org_pubref_rules_protobuf//python:rules.bzl", "py_proto_repositories")
+
+py_proto_repositories()
+
 # Ignore some directories
 local_repository(
     name = "ignored_tensorflow_examples",
@@ -110,4 +121,15 @@ local_repository(
 local_repository(
     name = "golang_bazel_buildtools",
     path = "./lang/go/src/github.com/bazelbuild/buildtools",
+)
+
+local_repository(
+    name = "tensorflow_serving",
+    path = "./third_party/serving",
+)
+
+new_local_repository(
+    name = "tensorflow_models",
+    build_file = "./third_party/BUILD.tensorflow_models",
+    path = "./third_party/tensorflow_models/research",
 )
