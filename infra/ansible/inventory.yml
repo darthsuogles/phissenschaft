@@ -1,0 +1,6 @@
+all:
+  hosts:
+    erjong:
+      ansible_host: erjong
+      ansible_user: phi9t
+      ansible_python_interpreter: /usr/bin/python3

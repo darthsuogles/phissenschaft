@@ -1,0 +1,16 @@
+---
+- name: Install necessary packages
+  apt:
+    name: ['gcc', 'git', 'sudo', 'wget', 'curl']
+    state: latest
+    update_cache: yes
+
+- name: Add graphics drivers PPA
+  apt_repository:
+    repo: 'ppa:graphics-drivers/ppa'
+
+- name: Install graphics driver
+  apt:
+    name: nvidia-390
+    state: latest
+    update_cache: yes
