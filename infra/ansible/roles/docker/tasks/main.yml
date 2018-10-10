@@ -1,0 +1,38 @@
+---
+- name: Write docker source script
+  copy:
+    dest: /tmp/add_docker_source
+    mode: a+x
+    content: |
+      #!/bin/bash
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+      distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+      curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | \
+      tee /etc/apt/sources.list.d/nvidia-docker.list
+
+      curl -fsSL https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+      add-apt-repository \
+        "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+        $(lsb_release -cs) \
+        stable"
+
+- name: Run docker source script
+  become: yes
+  command: /tmp/add_docker_source
+
+- name: Remove existing docker installation
+  apt:
+    name: ['docker', 'docker-engine', 'docker.io']
+    state: absent
+
+- name: Install docker prerequisites
+  apt:
+    name: ['apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common']
+    state: latest
+    update_cache: yes
+
+- name: Install nvidia-docker
+  apt:
+    name: ['docker-ce', 'nvidia-docker2']
+    state: latest
+    update_cache: yes
