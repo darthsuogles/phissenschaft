@@ -115,3 +115,6 @@
 [submodule "third_party/detectron"]
 	path = third_party/detectron
 	url = https://github.com/facebookresearch/Detectron.git
+[submodule "third_party/carla"]
+	path = third_party/carla
+	url = https://github.com/carla-simulator/carla.git
