@@ -1,9 +1,18 @@
 import os
 import subprocess
+import sys
 from pathlib import Path
 
-def source_import(fpath: Path, globals=globals(), locals=locals()):
-    with fpath.open('r') as fin:
+def add_to_path(module_fpath: Path):
+    if not module_fpath.exists():
+        raise ValueError("cannot find {}".format(module_fpath))
+    module_path = str(module_fpath)
+    if module_path in sys.path:
+        return
+    sys.path.append(module_path)
+
+def source_import(module_fpath: Path, globals=globals(), locals=locals()):
+    with module_fpath.open('r') as fin:
         exec(fin.read(), globals, locals)
 
 def git_repo_root() -> Path:

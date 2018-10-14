@@ -1,0 +1,18 @@
+#load("@com_google_protobuf//:protobuf.bzl", "py_proto_library")
+load("@org_pubref_rules_protobuf//python:rules.bzl", "py_proto_library")
+load(":protos.bzl", "py_protos")
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "object_detection",
+    srcs = glob(["tensorflow_models/object_detection/**/*.py"]),
+    deps = [":object_detection_py_pb2"],
+)
+
+py_protos(
+    name = "object_detection_py_pb2",
+    protos = glob(["tensorflow_models/research/object_detection/protos/*.proto"]),
+)

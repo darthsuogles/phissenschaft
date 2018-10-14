@@ -115,3 +115,6 @@
 [submodule "third_party/detectron"]
 	path = third_party/detectron
 	url = https://github.com/facebookresearch/Detectron.git
+[submodule "third_party/tensor_comprehensions"]
+	path = third_party/tensor_comprehensions
+	url = https://github.com/facebookresearch/TensorComprehensions.git
