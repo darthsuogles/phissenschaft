@@ -18,3 +18,11 @@ def source_import(module_fpath: Path, globals=globals(), locals=locals()):
 def git_repo_root() -> Path:
     _raw_output = subprocess.check_output(["git", "rev-parse", "--show-toplevel"]).strip()
     return Path(_raw_output.decode('ascii'))
+
+def import_tensorflow_models():
+    """\
+    Import tensorflow models along with
+    """
+    _TF_MODELS_ROOT = git_repo_root() / 'third_party' / 'tensorflow_models' / 'research'
+    add_to_path(_TF_MODELS_ROOT / 'slim')
+    add_to_path(_TF_MODELS_ROOT)
