@@ -146,7 +146,7 @@ init_unreal_engine_builder
 
 function unreal_exec {
     nvidia-docker exec -it unreal-engine-builder-env \
-		  /usr/local/bin/gosu carla /bin/bash $@
+		  /usr/local/bin/gosu carla $@
 }
 
 unreal_exec ./GenerateProjectFiles.sh
