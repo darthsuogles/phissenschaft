@@ -128,5 +128,8 @@ cat <<_RUN_BUILD_INST_EOF_
 Please run your build with this command
 
 docker exec -it pytorch-builder-env /usr/local/bin/gosu pytorch bash
+
+For building wheels for distribution, check this
+https://github.com/pytorch/builder/blob/master/wheel/build_wheel.sh
 ==========================================
 _RUN_BUILD_INST_EOF_
