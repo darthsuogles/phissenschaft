@@ -18,7 +18,22 @@ implementation we subsample the output activations in the last residual unit of
 each block, instead of subsampling the input activations in the first residual
 unit of each block. The two implementations give identical results but our
 implementation is more memory efficient.
+
+To use resnet in some application:
+
+resnet_graph = tf.Graph()
+with resnet_graph.as_default():
+    features = tf.placeholder(
+        dtype=tf.float32, shape=[None, 513, 513, 3],
+        name='input_tensor')
+    with slim.arg_scope(resnet_v2.resnet_arg_scope()):
+        net, end_points = resnet_v2.resnet_v2_101(features,
+                                                  21,
+                                                  is_training=False,
+                                                  global_pool=False,
+                                                  output_stride=16)
 """
+
 
 from tools.hack import *
 import tensorflow as tf
@@ -51,26 +66,9 @@ def get_randn_tensor(name: str, d1, *args):
     return get_random_tensor(name, np.random.randn(*shape))
 
 
-features = get_randn_tensor('input_tensor', 1, 224, 224, 3)
-subsampled_features = slim.max_pool2d(
-    features, [1, 1], stride=2, scope=None)
+num_classes = 17
 
-resnet_graph = tf.Graph()
-with resnet_graph.as_default():
-    features = tf.placeholder(
-        dtype=tf.float32, shape=[None, 513, 513, 3],
-        name='input_tensor')
-    with slim.arg_scope(resnet_v2.resnet_arg_scope()):
-        net, end_points = resnet_v2.resnet_v2_101(features,
-                                                  21,
-                                                  is_training=False,
-                                                  global_pool=False,
-                                                  output_stride=16)
-
-layers = tf.keras.layers
-
-resnet_tiny_graph = tf.Graph()
-with resnet_tiny_graph.as_default():
+def resnet_tiny_fn(features, labels, mode):
     block_gen = resnet_v2.resnet_v2_block
     blocks = [
         block_gen('block1', base_depth=1, num_units=2, stride=2),
@@ -80,19 +78,51 @@ with resnet_tiny_graph.as_default():
     ]
     nominal_stride = 8  # 2 * 2 * 2 * 1
 
-    input_features = tf.placeholder(
-        dtype=tf.float32, shape=[1, 114, 114, 16])
-
-    logits, endpoints = resnet_v2.resnet_v2(input_features, blocks,
-                                            num_classes=17,
-                                            is_training=False,
-                                            # without `global_pool`, output must match block reduction
-                                            global_pool=True,
-                                            output_stride=None,
-                                            include_root_block=True,
-                                            scope='resnet_tiny')
+    is_training = tf.estimator.ModeKeys.TRAIN == mode
 
     with slim.arg_scope(resnet_utils.resnet_arg_scope()):
-        with slim.arg_scope([slim.layers.batch_norm], is_training=False):
-            output_features = resnet_utils.stack_blocks_dense(
-                input_features, blocks, nominal_stride)
+        with slim.arg_scope([slim.layers.batch_norm], is_training=is_training):
+            logits, endpoints = resnet_v2.resnet_v2(
+                features['x'], blocks,
+                num_classes=num_classes,
+                is_training=is_training,
+                # without `global_pool`, output must match block reduction
+                global_pool=True,
+                output_stride=None,
+                include_root_block=True,
+                reuse=tf.AUTO_REUSE,
+                scope='resnet_tiny')
+
+    # This only requires the indices, rather than one-hot labels
+    losses = tf.losses.sparse_softmax_cross_entropy(
+        labels=labels, logits=logits)
+
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001)
+    train_op = optimizer.minimize(
+        loss=losses,
+        global_step=tf.train.get_global_step())
+
+    return tf.estimator.EstimatorSpec(
+        mode=mode, loss=losses, train_op=train_op)
+
+
+# We do NOT have to provide as session for this
+train_size = 100
+train_features = np.random.randn(train_size, 114, 114, 16).astype(np.float32)
+train_labels = np.random.randint(low=0, high=num_classes, size=train_size).astype(np.int32)
+train_input_fn = tf.estimator.inputs.numpy_input_fn(
+    x={"x": train_features},
+    y=train_labels,
+    batch_size=4,
+    num_epochs=None,
+    shuffle=True)
+
+estimator = tf.estimator.Estimator(
+    model_fn=resnet_tiny_fn,
+    model_dir="/tmp/resnet_tiny_dir")
+
+estimator.train(input_fn=train_input_fn,
+                steps=100)
+
+# For a bridge between slim.arg_scope and tf.keras.layers
+# https://github.com/tensorflow/models/blob/master/research/object_detection/builders/hyperparams_builder.py
