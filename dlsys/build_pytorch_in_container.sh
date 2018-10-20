@@ -11,7 +11,7 @@ under the root directory of pytorch.
 ==========================================
 _SCRIPT_LOCATION_WARNING_EOF_
 
-declare -xr BASE_DOCKER_IMAGE="nvidia/cuda:9.0-cudnn7-devel"
+declare -xr BASE_DOCKER_IMAGE="nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04"
 docker pull "${BASE_DOCKER_IMAGE}"
 
 nvidia-docker build "$(mktemp -d)" \
@@ -21,7 +21,7 @@ nvidia-docker build "$(mktemp -d)" \
 ARG BASE_DOCKER_IMAGE
 FROM ${BASE_DOCKER_IMAGE}
 
-ARG PYTHON_VERSION=3.6
+ARG PYTHON_VERSION=3.7
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
          build-essential \
@@ -44,7 +44,7 @@ RUN curl -o ~/miniconda.sh -O  https://repo.continuum.io/miniconda/Miniconda3-la
 
 ENV PATH /opt/conda/bin:$PATH
 
-ENV GOSU_VERSION 1.10
+ENV GOSU_VERSION 1.11
 RUN set -ex; \
 	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
 	curl -fsSL -o /usr/local/bin/gosu \
@@ -57,7 +57,6 @@ RUN set -ex; \
 	gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4; \
 	gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
 	rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc; \
-	\
 	chmod +x /usr/local/bin/gosu; \
 # verify that the binary works
 	gosu nobody true
@@ -93,8 +92,7 @@ chown "${CONTAINER_USER_NAME}" /home/"${CONTAINER_USER_NAME}"
 sleep infinity
 _ENTRYPOINT_EOF_
 
-
-mkdir -p "${_bsd_}/._tf_build_cache"
+docker rm -f pytorch-builder-env &>/dev/null || true
 
 nvidia-docker run -d \
 	      --env CONTAINER_USER_NAME=pytorch \
@@ -115,11 +113,12 @@ set -eu -o pipefail
 
 sudo ln -fsn /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1
 export LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:"${LD_LIBRARY_PATH:-.}"
+export PATH=/usr/local/cuda/bin:/opt/conda/bin:"${PATH:-.}"
 
 export TORCH_CUDA_ARCH_LIST="3.5 5.2 6.0 6.1 7.0+PTX"
 export TORCH_NVCC_FLAGS="-Xfatbin -compress-all"
 export CMAKE_PREFIX_PATH="$(dirname $(which conda))/../"
-pip install -v .
+python setup.py bdist_wheel -d $PWD
 
 _BUILD_PYTORCH_EOF_
 
