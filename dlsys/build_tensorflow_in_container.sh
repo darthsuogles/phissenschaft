@@ -11,7 +11,8 @@ under the root directory of tensorflow.
 ==========================================
 _SCRIPT_LOCATION_WARNING_EOF_
 
-BASE_CONTAINER_IMAGE=tensorflow/tensorflow:latest-devel-gpu-py3
+BASE_CONTAINER_IMAGE=nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
+#BASE_CONTAINER_IMAGE=tensorflow/tensorflow:latest-devel-gpu-py3
 
 #docker pull "${BASE_CONTAINER_IMAGE}"
 
@@ -21,8 +22,6 @@ nvidia-docker build "$(mktemp -d)" \
 	      -f -<<'_DOCKERFILE_EOF_'
 ARG BASE_CONTAINER_IMAGE
 FROM ${BASE_CONTAINER_IMAGE}
-
-FROM nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
@@ -73,11 +72,13 @@ RUN mkdir /usr/local/cuda-10.0/lib &&  \
     ln -s /usr/include/nccl.h /usr/local/cuda/include/nccl.h
 
 # Install bazel
-RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list && \
-    curl https://bazel.build/bazel-release.pub.gpg | apt-key add - && \
-    apt-get update && \
-    apt-get install -y bazel
-
+ENV BAZEL_VERSION 0.15.0
+RUN curl -fsSL -o /tmp/install_bazel.sh \
+        -O https://github.com/bazelbuild/bazel/releases/download/$BAZEL_VERSION/bazel-$BAZEL_VERSION-installer-linux-x86_64.sh \
+	&& chmod +x /tmp/install_bazel.sh \
+	&& /tmp/install_bazel.sh \
+	&& rm -f /tmp/install_bazel.sh
+	
 # Running bazel inside a `docker build` command causes trouble, cf:
 #   https://github.com/bazelbuild/bazel/issues/134
 # The easiest solution is to set up a bazelrc file forcing --batch.
@@ -154,8 +155,11 @@ sleep infinity
 _ENTRYPOINT_EOF_
 
 # Create build directories shared by host and container
-sudo mkdir -p /tf_build/cache /tf_build/output
-sudo chown -R "${USER}" /tf_build
+mkdir -p /workspace/build_cache/tensorflow && pushd $_
+sudo mkdir -p cache output
+popd
+sudo chown -R "${USER}" /workspace/build_cache/tensorflow
+sudo ln -sfn /workspace/build_cache/tensorflow /tf_build
 
 docker rm -f tensorflow-builder-env &>/dev/null || true
 
@@ -169,38 +173,36 @@ nvidia-docker run -d \
 	      tensorflow-builder:base \
 	      /workspace/._prepare_and_await.sh
 
-
 touch ._build_tensorflow_impl.sh && chmod +x $_
 
+# This file is meant to be source'd 
 cat <<'_BUILD_TENSORFLOW_EOF_' | tee ._build_tensorflow_impl.sh
-#!/bin/bash
 
-set -eu -o pipefail
-
-sudo ln -fsn /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1
-export LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:"${LD_LIBRARY_PATH:-.}"
-
-tensorflow/tools/ci_build/builds/configured GPU
-
-function bazel_build {
+function bazel-build {
     bazel \
-	--output_base=/tf_build/output \
+	--output_user_root=/tf_build/output \
 	build \
 	-c opt \
 	--copt=-mavx \
 	--config=cuda \
-	--disk_cache=/tf_build/cache \
-	--cxxopt="-D_GLIBCXX_USE_CXX11_ABI=0" \
 	$@
 }
 
-bazel_build tensorflow/tools/pip_package:build_pip_package
+function build-tensorflow-python {
+    set -eu -o pipefail
 
-sudo rm /usr/local/cuda/lib64/stubs/libcuda.so.1
+    sudo ln -fsn /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1
+    export LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:"${LD_LIBRARY_PATH:-.}"
 
-bazel-bin/tensorflow/tools/pip_package/build_pip_package /workspace/pip
-pip --no-cache-dir install --upgrade /workspace/pip/tensorflow-*.whl
-rm -rf /root/.cache
+    tensorflow/tools/ci_build/builds/configured GPU
+
+    bazel-build tensorflow/tools/pip_package:build_pip_package
+
+    sudo rm /usr/local/cuda/lib64/stubs/libcuda.so.1
+
+    mkdir -p /workspace/wheelhouse
+    bazel-bin/tensorflow/tools/pip_package/build_pip_package /workspace/wheelhouse
+}
 
 _BUILD_TENSORFLOW_EOF_
 
@@ -211,3 +213,15 @@ Please run your build with this command
 docker exec -it tensorflow-builder-env /usr/local/bin/gosu tensorflow bash
 ==========================================
 _RUN_BUILD_INST_EOF_
+
+function docker_exec {
+    docker exec -it tensorflow-builder-env /usr/local/bin/gosu tensorflow $@
+}
+
+printf "Waiting for a while until things are settled ... "
+sleep 7
+printf "done\n"
+
+docker_exec pip install --user -U numpy
+docker_exec sudo ln -sfn /usr/bin/python3 /usr/bin/python
+docker_exec bash
