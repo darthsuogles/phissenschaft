@@ -12,7 +12,8 @@ under the root directory of pytorch.
 _SCRIPT_LOCATION_WARNING_EOF_
 
 declare -xr BASE_DOCKER_IMAGE="nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04"
-docker pull "${BASE_DOCKER_IMAGE}"
+# Don't pull the latest version unless absolutely have to
+# docker pull "${BASE_DOCKER_IMAGE}"
 
 nvidia-docker build "$(mktemp -d)" \
 	      --build-arg BASE_DOCKER_IMAGE="${BASE_DOCKER_IMAGE}" \
@@ -103,7 +104,6 @@ nvidia-docker run -d \
 	      pytorch-builder:base \
 	      /workspace/._prepare_and_await.sh
 
-
 touch ._build_pytorch_impl.sh && chmod +x $_
 
 cat <<'_BUILD_PYTORCH_EOF_' | tee ._build_pytorch_impl.sh
@@ -132,3 +132,8 @@ For building wheels for distribution, check this
 https://github.com/pytorch/builder/blob/master/wheel/build_wheel.sh
 ==========================================
 _RUN_BUILD_INST_EOF_
+
+printf "Wait for a while till things are settled ... "
+sleep 7
+printf "done\n"
+docker exec -it pytorch-builder-env /usr/local/bin/gosu pytorch bash

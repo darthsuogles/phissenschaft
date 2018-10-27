@@ -11,12 +11,22 @@ under the root directory of tensorflow.
 ==========================================
 _SCRIPT_LOCATION_WARNING_EOF_
 
+function quit_with { >& printf "ERROR: $@, exit"; exit 1; }
+
 BASE_CONTAINER_IMAGE=nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
 #BASE_CONTAINER_IMAGE=tensorflow/tensorflow:latest-devel-gpu-py3
 
+# Don't pull the latest container unless explicitly choose to
 #docker pull "${BASE_CONTAINER_IMAGE}"
 
-nvidia-docker build "$(mktemp -d)" \
+pip_pkgs_file="${_bsd_}/tensorflow/tools/ci_build/install/install_python3.6_pip_packages.sh"
+[[ -f "${pip_pkgs_file}" ]] || \
+    quit_with "cannot find python package files, please make sure you are running in tensorflow git root"
+
+docker_context_tmpdir="$(mktemp -d)"
+grep -Ei '^pip' "${pip_pkgs_file}" | tee "${docker_context_tmpdir}/pip_install_commands"
+
+nvidia-docker build "${docker_context_tmpdir}" \
 	      --build-arg BASE_CONTAINER_IMAGE="${BASE_CONTAINER_IMAGE}" \
 	      -t tensorflow-builder:base \
 	      -f -<<'_DOCKERFILE_EOF_'
@@ -123,6 +133,9 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
 	sudo \
         && rm -rf /var/lib/apt/lists/*
 
+COPY pip_install_commands /tmp/pip_install_commands
+RUN bash /tmp/pip_install_commands
+
 _DOCKERFILE_EOF_
 
 touch ._prepare_and_await.sh && chmod a+x $_
@@ -173,12 +186,14 @@ nvidia-docker run -d \
 	      tensorflow-builder:base \
 	      /workspace/._prepare_and_await.sh
 
-touch ._build_tensorflow_impl.sh && chmod +x $_
-
 # This file is meant to be source'd 
-cat <<'_BUILD_TENSORFLOW_EOF_' | tee ._build_tensorflow_impl.sh
+cat <<'_BUILD_TENSORFLOW_EOF_' | tee SOURCE_ME_TO_BUILD_TENSORFLOW
 
 function bazel-build {
+    sudo ln -fsn /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1
+    export LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:"${LD_LIBRARY_PATH:-.}"
+    tensorflow/tools/ci_build/builds/configured GPU
+
     bazel \
 	--output_user_root=/tf_build/output \
 	build \
@@ -186,20 +201,12 @@ function bazel-build {
 	--copt=-mavx \
 	--config=cuda \
 	$@
+
+    sudo rm /usr/local/cuda/lib64/stubs/libcuda.so.1    				
 }
 
-function build-tensorflow-python {
-    set -eu -o pipefail
-
-    sudo ln -fsn /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1
-    export LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:"${LD_LIBRARY_PATH:-.}"
-
-    tensorflow/tools/ci_build/builds/configured GPU
-
+function bazel-build-tensorflow-python {
     bazel-build tensorflow/tools/pip_package:build_pip_package
-
-    sudo rm /usr/local/cuda/lib64/stubs/libcuda.so.1
-
     mkdir -p /workspace/wheelhouse
     bazel-bin/tensorflow/tools/pip_package/build_pip_package /workspace/wheelhouse
 }
@@ -222,6 +229,5 @@ printf "Waiting for a while until things are settled ... "
 sleep 7
 printf "done\n"
 
-docker_exec pip install --user -U numpy
 docker_exec sudo ln -sfn /usr/bin/python3 /usr/bin/python
 docker_exec bash
