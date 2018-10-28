@@ -1,3 +1,6 @@
+from tools.hack import *
+import_tensorflow_models()
+
 # This sample uses a UFF ResNet50 Model to create a TensorRT Inference Engine
 import random
 from PIL import Image

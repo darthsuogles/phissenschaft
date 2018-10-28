@@ -96,6 +96,7 @@ _ENTRYPOINT_EOF_
 docker rm -f pytorch-builder-env &>/dev/null || true
 
 nvidia-docker run -d \
+	      --ipc host \
 	      --env CONTAINER_USER_NAME=pytorch \
 	      --env CONTAINER_USER_ID="$(id -u)" \
 	      --volume "${_bsd_}":/workspace \

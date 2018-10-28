@@ -107,6 +107,9 @@ ENV TF_CUDA_COMPUTE_CAPABILITIES=3.5,5.2,6.0,6.1,7.0
 ENV TF_CUDA_VERSION=10.0
 ENV TF_CUDNN_VERSION=7
 
+# NCCL 2.x
+ENV TF_NCCL_VERSION=2
+
 ENV GOSU_VERSION 1.11
 RUN set -eux; \
 # save list of currently installed packages for later so we can clean up
@@ -135,6 +138,9 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
 
 COPY pip_install_commands /tmp/pip_install_commands
 RUN bash /tmp/pip_install_commands
+
+ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:"${LD_LIBRARY_PATH:-.}"
+ENV PATH=/usr/local/cuda/bin:"${PATH}"
 
 _DOCKERFILE_EOF_
 
@@ -191,7 +197,6 @@ cat <<'_BUILD_TENSORFLOW_EOF_' | tee SOURCE_ME_TO_BUILD_TENSORFLOW
 
 function bazel-build {
     sudo ln -fsn /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1
-    export LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:"${LD_LIBRARY_PATH:-.}"
     tensorflow/tools/ci_build/builds/configured GPU
 
     bazel \
