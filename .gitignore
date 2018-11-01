@@ -1,3 +1,7 @@
+# Emacs temporary files
+*~
+
+# Scala build target files
 target/
 target/*
 
