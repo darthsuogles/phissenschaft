@@ -10,10 +10,14 @@ try:
 except NameError:
     FileNotFoundError = IOError
 
+
 def GiB(val):
     return val * 1 << 30
 
-def find_sample_data(description="Runs a TensorRT Python sample", subfolder="", find_files=[]):
+
+def find_sample_data(description="Runs a TensorRT Python sample",
+                     subfolder="",
+                     find_files=[]):
     '''
     Parses sample arguments.
     Args:
@@ -28,23 +32,33 @@ def find_sample_data(description="Runs a TensorRT Python sample", subfolder="", 
     kDEFAULT_DATA_ROOT = os.path.abspath("/usr/src/tensorrt/data")
     parser = argparse.ArgumentParser(description=description)
     # Standard command-line arguments for all samples.
-    parser.add_argument("-d", "--datadir", help="Location of the TensorRT sample data directory.")
+    parser.add_argument(
+        "-d",
+        "--datadir",
+        help="Location of the TensorRT sample data directory.")
     args, unknown_args = parser.parse_known_args()
     # If data directory is not specified, use the default.
     data_root = args.datadir if args.datadir else kDEFAULT_DATA_ROOT
     data_path = os.path.join(data_root, subfolder) if subfolder else data_root
     # Make sure data directory exists.
     if not (os.path.exists(data_path)):
-        raise FileNotFoundError(data_path + " does not exist. Please provide the correct data path with the -d option.")
+        raise FileNotFoundError(
+            data_path +
+            " does not exist. Please provide the correct data path with the -d option."
+        )
     # Find all requested files.
     for index, f in enumerate(find_files):
         find_files[index] = os.path.abspath(os.path.join(data_path, f))
         if not os.path.exists(find_files[index]):
-            raise FileNotFoundError(find_files[index] + " does not exist. Please provide the correct data path with the -d option.")
+            raise FileNotFoundError(
+                find_files[index] +
+                " does not exist. Please provide the correct data path with the -d option."
+            )
     if find_files:
         return data_path, find_files
     else:
         return data_path
+
 
 # Simple helper data class that's a little nicer to use than a 2-tuple.
 class HostDeviceMem(object):
@@ -57,6 +71,7 @@ class HostDeviceMem(object):
 
     def __repr__(self):
         return self.__str__()
+
 
 # Allocates all buffers required for an engine, i.e. host/device inputs/outputs.
 def allocate_buffers(engine):
@@ -78,6 +93,7 @@ def allocate_buffers(engine):
         else:
             outputs.append(HostDeviceMem(host_mem, device_mem))
     return inputs, outputs, bindings, stream
+
 
 # This function is generalized for multiple inputs/outputs.
 # inputs and outputs are expected to be lists of HostDeviceMem objects.

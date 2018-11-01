@@ -118,6 +118,12 @@ RUN set -ex; \
 # verify that the binary works
 	gosu nobody true
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    emacs-nox \
+    sudo \
+    && \
+    rm -rf /var/lib/apt/lists/*
+
 _DOCKERFILE_EOF_
 
 ##################################################################################

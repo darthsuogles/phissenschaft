@@ -20,9 +20,7 @@ nvidia-docker build "$(mktemp -d)" \
 	      -t pytorch-builder:base \
 	      -f -<<'_DOCKERFILE_EOF_'
 ARG BASE_DOCKER_IMAGE
-FROM ${BASE_DOCKER_IMAGE}
-
-ARG PYTHON_VERSION=3.7
+FROM ${BASE_DOCKER_IMAGE} AS OS_BASE_LAYER
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
          build-essential \
@@ -35,15 +33,42 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
          libpng-dev &&\
      rm -rf /var/lib/apt/lists/*
 
-RUN curl -o ~/miniconda.sh -O  https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh  && \
-     chmod +x ~/miniconda.sh && \
-     ~/miniconda.sh -b -p /opt/conda && \
-     rm ~/miniconda.sh && \
-     /opt/conda/bin/conda install -y python=$PYTHON_VERSION numpy pyyaml scipy ipython mkl mkl-include cython typing && \
-     /opt/conda/bin/conda install -y -c pytorch magma-cuda90 && \
-     /opt/conda/bin/conda clean -ya
+FROM OS_BASE_LAYER AS CONDA_LAYER
 
-ENV PATH /opt/conda/bin:$PATH
+ARG PYTHON_VERSION=3.7
+ENV PYTHON_VERSION=${PYTHON_VERSION}
+
+RUN curl -fsSL -o /tmp/miniconda.sh \
+         -O https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+    chmod +x /tmp/miniconda.sh && \
+    /tmp/miniconda.sh -b -p /opt/conda && \
+    rm /tmp/miniconda.sh 
+
+RUN /opt/conda/bin/conda install -y \
+    python=$PYTHON_VERSION \
+    numpy \
+    pyyaml \
+    scipy \
+    ipython \
+    mkl \
+    mkl-include \
+    cython \
+    typing
+
+RUN /opt/conda/bin/conda clean -ya
+
+FROM CONDA_LAYER AS ENV_LAYER
+
+RUN ln -fsn /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1
+
+ENV LD_LIBRARY_PATH /usr/local/cuda/lib64/stubs:/usr/local/cuda/lib64:"${LD_LIBRARY_PATH}"
+ENV PATH /usr/local/cuda/bin:/opt/conda/bin:"${PATH}"
+
+ENV TORCH_CUDA_ARCH_LIST "3.5 5.2 6.0 6.1 7.0+PTX"
+ENV TORCH_NVCC_FLAGS "-Xfatbin -compress-all"
+ENV CMAKE_PREFIX_PATH /opt/conda
+
+FROM ENV_LAYER AS RUNTIME_LAYER
 
 ENV GOSU_VERSION 1.11
 RUN set -ex; \
@@ -100,35 +125,22 @@ nvidia-docker run -d \
 	      --env CONTAINER_USER_NAME=pytorch \
 	      --env CONTAINER_USER_ID="$(id -u)" \
 	      --volume "${_bsd_}":/workspace \
+	      --volume /workspace/wheelhouse/pytorch:/wheelhouse \
 	      --workdir /workspace \
 	      --name pytorch-builder-env \
 	      pytorch-builder:base \
 	      /workspace/._prepare_and_await.sh
 
-touch ._build_pytorch_impl.sh && chmod +x $_
+cat <<'_BUILD_PYTORCH_EOF_' | tee SOURCE_ME_TO_BUILD_PYTORCH
 
-cat <<'_BUILD_PYTORCH_EOF_' | tee ._build_pytorch_impl.sh
-#!/bin/bash
-
-set -eu -o pipefail
-
-sudo ln -fsn /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1
-export LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:"${LD_LIBRARY_PATH:-.}"
-export PATH=/usr/local/cuda/bin:/opt/conda/bin:"${PATH:-.}"
-
-export TORCH_CUDA_ARCH_LIST="3.5 5.2 6.0 6.1 7.0+PTX"
-export TORCH_NVCC_FLAGS="-Xfatbin -compress-all"
-export CMAKE_PREFIX_PATH="$(dirname $(which conda))/../"
-python setup.py bdist_wheel -d $PWD
+function build-pytorch {
+    python setup.py bdist_wheel -d /wheelhouse
+}
 
 _BUILD_PYTORCH_EOF_
 
 cat <<_RUN_BUILD_INST_EOF_
 ==========================================
-Please run your build with this command
-
-docker exec -it pytorch-builder-env /usr/local/bin/gosu pytorch bash
-
 For building wheels for distribution, check this
 https://github.com/pytorch/builder/blob/master/wheel/build_wheel.sh
 ==========================================
