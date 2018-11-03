@@ -4,27 +4,15 @@
 [submodule "dlsys/mshadow"]
 	path = dlsys/mshadow
 	url = https://github.com/darthsuogles/mshadow.git
-[submodule "dlsys/pyro"]
-	path = dlsys/pyro
-	url = https://github.com/darthsuogles/pyro.git
 [submodule "natlang/sling"]
 	path = natlang/sling
 	url = https://github.com/darthsuogles/sling.git
-[submodule "dlsys/trch_ex"]
-	path = dlsys/trch_ex
-	url = https://github.com/pytorch/examples.git
 [submodule "dlsys/PytorchWCT"]
 	path = dlsys/PytorchWCT
 	url = https://github.com/sunshineatnoon/PytorchWCT.git
-[submodule "dlsys/tnsrphlw_ex"]
-	path = dlsys/tnsrphlw_ex
-	url = https://github.com/tensorflow/models.git
 [submodule "pkg/spack"]
 	path = pkg/spack
 	url = https://github.com/spack/spack.git
-[submodule "dlsys/tensor2tensor"]
-	path = dlsys/tensor2tensor
-	url = https://github.com/tensorflow/tensor2tensor.git
 [submodule "database/leveldb"]
 	path = database/leveldb
 	url = https://github.com/google/leveldb.git
@@ -64,9 +52,6 @@
 [submodule "pixsrl/pbrt-v3"]
 	path = pixsrl/pbrt-v3
 	url = https://github.com/mmp/pbrt-v3.git
-[submodule "dlsys/mxnet"]
-	path = dlsys/mxnet
-	url = https://github.com/darthsuogles/mxnet.git
 [submodule "dlsys/auto_ml_enas"]
 	path = dlsys/auto_ml_enas
 	url = https://github.com/carpedm20/ENAS-pytorch.git
@@ -115,6 +100,6 @@
 [submodule "third_party/detectron"]
 	path = third_party/detectron
 	url = https://github.com/facebookresearch/Detectron.git
-[submodule "third_party/carla"]
-	path = third_party/carla
-	url = https://github.com/carla-simulator/carla.git
+[submodule "third_party/tensor_comprehensions"]
+	path = third_party/tensor_comprehensions
+	url = https://github.com/facebookresearch/TensorComprehensions.git
