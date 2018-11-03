@@ -6,47 +6,17 @@ _bsd_="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 _script_fname="$(readlink -f "${BASH_SOURCE[0]}")"
 
 export UE4_ROOT=/opt/unreal_engine/4.19
+BASE_IMAGE=unreal-engine-builder:4.19
 
-if [[ "yes" != "${IS_INSIDE_DOCKER:-no}" ]]; then
-    docker ps -a | grep carla-builder-env &>/dev/null || \
-	nvidia-docker run -d \
-		      -e IS_INSIDE_DOCKER=yes \
-		      -v "${_script_fname}":/opt/build_carla.sh \
-		      -v "${_bsd_}":/workspace \		      
-		      -v /workspace/unreal_engine:/opt/unreal_engine \
-		      -e UE4_ROOT=/opt/unreal_engine/4.19 \
-		      -w /workspace \
-		      --name carla-builder-env \
-		      unreal-engine-builder:4.19 \
-		      sleep infinity
+function build_carla_docker_image {
+    nvidia-docker build "$(mktemp -d)" \
+		  --build-arg BASE_IMAGE="${BASE_IMAGE}" \
+		  -t carla-builder:unreal-4.19 \
+		  -f -<<'_DOCKERFILE_EOF_'
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE} AS DEPS_PKGS_LAYER
 
-    docker exec -it carla-builder-env \
-	   /usr/local/bin/gosu carla \
-	   /opt/build_carla.sh
-fi
-
-function install_cmake_impl {
-    declare -xr ver="${1}"
-    mkdir -p /tmp/cmake && pushd $_
-    local pkg="cmake-${ver}"
-    if [[ ! -d "${pkg}" ]]; then
-	local tarball="${pkg}.tar.gz"
-	[[ -f "${tarball}" ]] || wget "https://cmake.org/files/v${ver%.*}/${tarball}"
-	tar -zxvf "${tarball}"
-    fi
-    pushd "${pkg}"
-    ./bootstrap && make -j$(nproc) && sudo make install
-    popd
-    popd
-}
-
-function install_cmake {
-    local -r ver=3.12.2
-    cmake --version | grep "${ver}" || install_cmake_impl "${ver}"
-}
-
-function install_dependencies {
-    sudo apt install -y --no-install-recommends \
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
 	 rsync \
 	 python-dev \
 	 python-pip \
@@ -58,21 +28,59 @@ function install_dependencies {
 	 libjpeg-dev \
 	 g++-7
 
-    [[ -f /tmp/get-pip.py ]] || \
-	curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
-
-    for pcx in python python3; do
-	sudo ${pcx} /tmp/get-pip.py
-	sudo ${pcx} -m pip install -U pip
-	sudo ${pcx} -m pip install -U requests numpy Pillow pygame
+RUN curl https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py && \
+    for pcx in python python3; do \
+	${pcx} /tmp/get-pip.py && \
+	${pcx} -m pip install -U pip && \
+	${pcx} -m pip install -U \
+	  requests \
+	  numpy \
+	  Pillow \
+	  pygame \
+	  ; \
     done
-    
-    install_cmake    
+
+WORKDIR /tmp/cmake
+
+RUN set -eux; \
+    ver=3.12.2; \
+    pkg="cmake-${ver}"; \
+    tarball="${pkg}.tar.gz"; \
+    curl -fSL -O "https://cmake.org/files/v${ver%.*}/${tarball}" && \
+    tar -zxvf "${tarball}" && \
+    cd ${pkg} && \
+      ./bootstrap && \
+      make -j$(nproc) && \
+      make install && \
+    rm -f /tmp/cmake/${tarball}
+
+FROM DEPS_PKGS_LAYER AS RUNTIME_LAYER
+
+WORKDIR /workspace
+ENTRYPOINT ["sleep", "infinity"]
+_DOCKERFILE_EOF_
 }
 
-install_dependencies
+if [[ "yes" != "${IS_INSIDE_DOCKER:-no}" ]]; then
+    build_carla_docker_image
+    
+    docker ps -a | grep carla-builder-env &>/dev/null || \
+	nvidia-docker run -d \
+		      -e IS_INSIDE_DOCKER=yes \
+		      -v "${_script_fname}":/opt/build_carla.sh \
+		      -v "${_bsd_}":/workspace \
+		      -v /workspace/unreal_engine:/opt/unreal_engine \
+		      -e UE4_ROOT=/opt/unreal_engine/4.19 \
+		      -w /workspace \
+		      --name carla-builder-env \
+		      carla-builder:unreal-4.19
 
-make clean
+    docker exec -it carla-builder-env \
+	   /usr/local/bin/gosu carla \
+	   /opt/build_carla.sh
+fi
+
+#make clean
 ##############################
 make setup
 ./Update.sh
