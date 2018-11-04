@@ -5,7 +5,6 @@ set -eu -o pipefail
 _bsd_="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 _script_fname="$(readlink -f "${BASH_SOURCE[0]}")"
 
-export UE4_ROOT=/opt/unreal_engine/4.19
 BASE_IMAGE=unreal-engine-builder:4.19
 
 function build_carla_docker_image {
