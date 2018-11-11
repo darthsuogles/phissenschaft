@@ -1,4 +1,4 @@
-
+// -*- scala -*-
 import java.nio.file.{Path, Paths, Files}
 
 case class FPath(jfp: Path) {
