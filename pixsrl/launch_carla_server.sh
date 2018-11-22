@@ -33,7 +33,7 @@ function launch_server_sans_display {
 	   --privileged \
 	   -v $PWD/carla_settings.ini:/home/carla/CarlaSettings.ini \
 	   -e SDL_VIDEODRIVER=offscreen \
-	   -e NVIDIA_VISIBLE_DEVICES=0 \
+	   -e NVIDIA_VISIBLE_DEVICES=1 \
 	   --name "${CONTAINER}" \
 	   carla-simulator:latest \
 	   ./CarlaUE4.sh -carla-settings=CarlaSettings.ini -server $@

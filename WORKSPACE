@@ -119,6 +119,11 @@ local_repository(
 )
 
 local_repository(
+    name = "dlsys_custom_tensorflow_ops",
+    path = "./dlsys/custom_tensorflow_ops",
+)
+
+local_repository(
     name = "golang_bazel_buildtools",
     path = "./lang/go/src/github.com/bazelbuild/buildtools",
 )

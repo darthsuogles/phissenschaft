@@ -1,0 +1,110 @@
+#!/bin/bash
+
+set -eux -o pipefail
+
+_bsd_="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+function quit_with { >& printf "ERROR: $@, exit"; exit 1; }
+
+#BASE_CONTAINER_IMAGE=tensorflow-builder:base
+#BASE_CONTAINER_IMAGE=tensorflow/tensorflow:nightly-devel-gpu-py3
+#BASE_CONTAINER_IMAGE=tensorflow/tensorflow:latest-devel-gpu-py3
+BASE_CONTAINER_IMAGE=tensorflow/tensorflow:1.10.1-devel-gpu-py3
+
+CONTAINER_NAME=tensorflow-runtime
+_REPO_ROOT="$(git rev-parse --show-toplevel)"
+_REPO_WORKDIR="$(git rev-parse --show-prefix)"
+
+# Don't pull the latest container unless explicitly choose to
+#docker pull "${BASE_CONTAINER_IMAGE}"
+
+docker_temp_context="$(mktemp -d)"
+docker_entrypoint="${docker_temp_context}/prepare_and_await.sh"
+
+cat <<'_ENTRYPOINT_EOF_' | tee "${docker_entrypoint}"
+#!/bin/bash
+
+set -eux -o pipefail
+
+declare -xr CONTAINER_USER_ID
+declare -xr CONTAINER_USER_NAME
+
+echo "Starting with UID : ${CONTAINER_USER_ID}"
+useradd --shell /bin/bash \
+	-u "${CONTAINER_USER_ID}" -o -c "" \
+	-m "${CONTAINER_USER_NAME}"
+
+echo "${CONTAINER_USER_NAME}:${CONTAINER_USER_NAME}" | chpasswd
+usermod -aG sudo ${CONTAINER_USER_NAME}
+mkdir -p /etc/sudoers.d
+echo "${CONTAINER_USER_NAME} ALL=(ALL) NOPASSWD: ALL" \
+     > "/etc/sudoers.d/${CONTAINER_USER_NAME}"
+
+export HOME=/home/"${CONTAINER_USER_NAME}"
+chmod a+w /home/"${CONTAINER_USER_NAME}"
+chown "${CONTAINER_USER_NAME}" /home/"${CONTAINER_USER_NAME}"
+
+sleep infinity
+_ENTRYPOINT_EOF_
+
+chmod a+x "${docker_entrypoint}"
+
+nvidia-docker build "${docker_temp_context}" \
+	      --build-arg BASE_CONTAINER_IMAGE="${BASE_CONTAINER_IMAGE}" \
+          --build-arg CONTAINER_USER_NAME=tensorflow \
+	      --build-arg CONTAINER_USER_ID="$(id -u)" \
+	      -t "${CONTAINER_NAME}":base \
+	      -f -<<'_DOCKERFILE_EOF_'
+ARG BASE_CONTAINER_IMAGE
+FROM ${BASE_CONTAINER_IMAGE}
+
+ENV GOSU_VERSION 1.11
+RUN set -eux; \
+# save list of currently installed packages for later so we can clean up
+	apt-get update; \
+	apt-get install -y --no-install-recommends ca-certificates wget; \
+	if ! command -v gpg; then \
+		apt-get install -y --no-install-recommends gnupg2 dirmngr; \
+	fi; \
+	rm -rf /var/lib/apt/lists/*; \
+	\
+	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
+	wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch"; \
+	\
+	chmod +x /usr/local/bin/gosu; \
+# verify that the binary works
+	gosu --version; \
+	gosu nobody true
+
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
+        curl \
+        git \
+        rsync \
+        wget \
+	sudo \
+        && rm -rf /var/lib/apt/lists/*
+
+RUN ln -sfn /usr/bin/python3 /usr/bin/python
+
+ARG CONTAINER_USER_NAME
+ENV CONTAINER_USER_NAME=${CONTAINER_USER_NAME}
+ARG CONTAINER_USER_ID
+ENV CONTAINER_USER_ID=${CONTAINER_USER_ID}
+COPY prepare_and_await.sh /opt/prepare_and_await.sh
+ENTRYPOINT ["/opt/prepare_and_await.sh"]
+_DOCKERFILE_EOF_
+
+docker rm -f ${CONTAINER_NAME} &>/dev/null || true
+
+nvidia-docker run -d \
+          --volume /workspace/:/host \
+	      --volume "${_REPO_ROOT}":/workspace \
+	      --volume /tf_build:/tf_build \
+	      --workdir "/workspace/${_REPO_WORKDIR}" \
+	      --name "${CONTAINER_NAME}" \
+	      "${CONTAINER_NAME}":base
+
+function docker_exec {
+    docker exec -it "${CONTAINER_NAME}" /usr/local/bin/gosu tensorflow $@
+}
+docker_exec bash
