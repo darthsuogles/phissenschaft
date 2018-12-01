@@ -20,8 +20,9 @@ https://orgmode.org/worg/org-contrib/babel/intro.html
 #+RESULTS:
 : 1 13 15 21 21 32 37 87
 
-#+BEGIN_SRC C++ :includes <folly/FBVector.h> <iostream> <cassert> :flags "-std=c++14" :libs "/usr/local/Cellar/jemalloc/5.1.0/lib/libjemalloc.a"
+#+BEGIN_SRC C++ :includes <folly/FBVector.h> <vector> <iostream> <cassert> :flags "-std=c++1z" :libs "/usr/local/Cellar/jemalloc/5.1.0/lib/libjemalloc.a"
   folly::fbvector<int> numbers({0, 1, 2, 3});
+  //std::vector<int> numbers({0, 1, 2, 3});
   numbers.reserve(10);
   for (int i = 4; i < 10; i++) {
     numbers.push_back(i * 2);
@@ -35,9 +36,20 @@ https://orgmode.org/worg/org-contrib/babel/intro.html
 #+RESULTS:
 
 
-#+BEGIN_SRC rust
-  for count in 0..3 {
-        println!("{} salut tout le monde!", count);
+#+BEGIN_SRC rustic :crates '(("regex" . "0.2") ("darling" . "0.1"))
+  fn main() {
+      println!("{}", "foo bar baz");
+  }
+#+END_SRC
+
+#+RESULTS:
+: foo bar baz
+
+#+BEGIN_SRC rustic
+  fn main() {
+      for count in 0..3 {
+	  println!("{} salut tout le monde!", count);
+      }
   }
 #+END_SRC
 
@@ -45,3 +57,12 @@ https://orgmode.org/worg/org-contrib/babel/intro.html
 : 0 salut tout le monde!
 : 1 salut tout le monde!
 : 2 salut tout le monde!
+
+
+#+BEGIN_SRC C++ :includes <vector> <iostream> :flags "-std=c++1z"
+  std::vector<unsigned char> vec;
+  std::cout << vec.size() << std::endl;
+#+END_SRC
+
+#+RESULTS:
+: 0

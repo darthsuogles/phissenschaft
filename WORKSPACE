@@ -90,6 +90,25 @@ go_register_toolchains()
 
 buildifier_dependencies()
 
+# gflags
+# https://gflags.github.io/gflags/#bazel
+git_repository(
+    name = "com_github_gflags_gflags",
+    remote = "https://github.com/gflags/gflags.git",
+    commit = "e171aa2d15ed9eb17054558e0b3a6a413bb01067",
+)
+
+# boost
+# https://github.com/nelhage/rules_boost
+git_repository(
+    name = "com_github_nelhage_rules_boost",
+    commit = "8a8853fd755496288995a603ce9aa2685709cd39",
+    remote = "https://github.com/nelhage/rules_boost",
+)
+
+load("@com_github_nelhage_rules_boost//:boost/boost.bzl", "boost_deps")
+boost_deps()
+
 # Protocol buffer
 git_repository(
     name = "org_pubref_rules_protobuf",
@@ -132,4 +151,16 @@ new_local_repository(
     name = "tensorflow_models",
     build_file = "./third_party/BUILD.tensorflow_models",
     path = "./third_party/tensorflow_models/research",
+)
+
+new_local_repository(
+    name = "point_cloud_library",
+    path = "/usr/local/opt/pcl",
+    build_file = "./third_party/BUILD.pcl",
+)
+
+new_local_repository(
+    name = "eigen",
+    path = "/usr/local/opt/eigen",
+    build_file = "./third_party/BUILD.eigen",
 )
