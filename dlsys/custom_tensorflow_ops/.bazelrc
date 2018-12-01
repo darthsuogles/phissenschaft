@@ -1,0 +1,4 @@
+build --action_env TF_HEADER_DIR="/usr/local/lib/python3.5/dist-packages/tensorflow/include"
+build --action_env TF_SHARED_LIBRARY_DIR="/usr/local/lib/python3.5/dist-packages/tensorflow"
+build --action_env PATH=/bin:/usr/bin:/usr/local/bin:/usr/local/cuda/bin
+build --force_python=PY3 --host_force_python=PY3
