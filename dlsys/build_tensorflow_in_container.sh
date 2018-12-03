@@ -16,8 +16,7 @@ function quit_with { >& printf "ERROR: $@, exit"; exit 1; }
 BASE_CONTAINER_IMAGE=nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
 #BASE_CONTAINER_IMAGE=tensorflow/tensorflow:latest-devel-gpu-py3
 
-# Don't pull the latest container unless explicitly choose to
-#docker pull "${BASE_CONTAINER_IMAGE}"
+docker pull "${BASE_CONTAINER_IMAGE}"
 
 pip_pkgs_file="${_bsd_}/tensorflow/tools/ci_build/install/install_python3.6_pip_packages.sh"
 [[ -f "${pip_pkgs_file}" ]] || \
@@ -70,10 +69,10 @@ RUN curl -fSsL -O https://bootstrap.pypa.io/get-pip.py && \
     rm get-pip.py
 
 RUN apt-get update && \
-        apt-get install nvinfer-runtime-trt-repo-ubuntu1804-5.0.0-rc-cuda10.0 \
+        apt-get install nvinfer-runtime-trt-repo-ubuntu1804-5.0.2-ga-cuda10.0 \
         && apt-get update \
-        && apt-get install -y --no-install-recommends libnvinfer5=5.0.0-1+cuda10.0 \
-        && apt-get install libnvinfer-dev=5.0.0-1+cuda10.0 \
+        && apt-get install -y --no-install-recommends libnvinfer5=5.0.2-1+cuda10.0 \
+        && apt-get install libnvinfer-dev=5.0.2-1+cuda10.0 \
         && rm -rf /var/lib/apt/lists/*
 
 # Link NCCL libray and header where the build script expects them.
@@ -88,7 +87,7 @@ RUN curl -fsSL -o /tmp/install_bazel.sh \
 	&& chmod +x /tmp/install_bazel.sh \
 	&& /tmp/install_bazel.sh \
 	&& rm -f /tmp/install_bazel.sh
-	
+
 # Running bazel inside a `docker build` command causes trouble, cf:
 #   https://github.com/bazelbuild/bazel/issues/134
 # The easiest solution is to set up a bazelrc file forcing --batch.
@@ -192,7 +191,7 @@ nvidia-docker run -d \
 	      tensorflow-builder:base \
 	      /workspace/._prepare_and_await.sh
 
-# This file is meant to be source'd 
+# This file is meant to be source'd
 cat <<'_BUILD_TENSORFLOW_EOF_' | tee SOURCE_ME_TO_BUILD_TENSORFLOW
 
 function bazel-build {
@@ -207,7 +206,7 @@ function bazel-build {
 	--config=cuda \
 	$@
 
-    sudo rm /usr/local/cuda/lib64/stubs/libcuda.so.1    				
+    sudo rm /usr/local/cuda/lib64/stubs/libcuda.so.1
 }
 
 function bazel-build-tensorflow-python {

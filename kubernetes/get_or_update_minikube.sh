@@ -39,7 +39,7 @@ function get_or_update_system_kubectl {
 
 export MINIKUBE_WANTUPDATENOTIFICATION=false
 export MINIKUBE_WANTREPORTERRORPROMPT=false
-export MINIKUBE_HOME="${HOME}"
+export MINIKUBE_HOME="${_bsd_}/._minikube"
 export CHANGE_MINIKUBE_NONE_USER=true
 
 mkdir -p "${MINIKUBE_HOME}" && pushd $_
@@ -55,21 +55,22 @@ which kubectl &>/dev/null \
 popd
 
 export KUBECONFIG=${MINIKUBE_HOME}/.kube/config
-sudo -E minikube stop || true
-sudo -E minikube delete || true
+# sudo -E minikube stop || true
+# sudo -E minikube delete || true
 # sudo -E minikube start --vm-driver=kvm2
-# minikube start --vm-driver kvm2 --gpu
 
-sudo rm -rf /var/lib/minikube/ || true
-sudo rm -rf /etc/kubernetes || true
+minikube start --vm-driver kvm2 --kubernetes-version=v1.12.2
 
-sudo -E minikube start \
-     --vm-driver=none \
-     --apiserver-ips 127.0.0.1 \
-     --apiserver-name localhost \
-     --kubernetes-version=v1.12.2
+# sudo rm -rf /var/lib/minikube/ || true
+# sudo rm -rf /etc/kubernetes || true
 
-kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v1.12/nvidia-device-plugin.yml
+# sudo -E minikube start \
+#      --vm-driver=none \
+#      --apiserver-ips 127.0.0.1 \
+#      --apiserver-name localhost \
+#      --kubernetes-version=v1.12.2
+
+# kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v1.12/nvidia-device-plugin.yml
 
 # this for loop waits until kubectl can access the api server that Minikube has created
 for i in {1..150}; do # timeout for 5 minutes
