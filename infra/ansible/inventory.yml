@@ -1,6 +1,6 @@
 all:
   hosts:
-    erjong:
-      ansible_host: erjong
-      ansible_user: phi9t
+    wasserhaus:
+      ansible_host: wasserhaus
+      ansible_user: xpilot
       ansible_python_interpreter: /usr/bin/python3
