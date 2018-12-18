@@ -1,0 +1,18 @@
+import $ivy.`org.platanios::tensorflow:0.4.0`
+import org.platanios.tensorflow.api._
+
+import java.nio.file.Paths
+import y.phi9t.core.FPath
+
+val t1 = Tensor(1.2, 4.5)
+val t2 = Tensor(-0.2, 1.1)
+t1 + t2 == Tensor(1.0, 5.6)
+
+
+val currPath: FPath = FPath(
+  Paths.get(".").toAbsolutePath().normalize())
+
+currPath / "native_lib"
+
+System.load((currPath / "native_lib" / "libtensorflow_framework.so").toString)
+System.load((currPath / "native_lib" / "libtensorflow.so").toString)

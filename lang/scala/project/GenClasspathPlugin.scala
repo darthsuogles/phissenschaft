@@ -5,7 +5,6 @@ import Keys._
 import sys.process.Process
 
 object GenClasspathPlugin extends AutoPlugin {
-
   /**
     * When an auto plugin provides a stable field such as val or object named autoImport,
     * the contents of the field are wildcard imported in set, eval, and .sbt files.

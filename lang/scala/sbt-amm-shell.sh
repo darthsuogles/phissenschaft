@@ -22,7 +22,12 @@ JAVA_OPTS="-Xmx4G -Xms32M"
 _jvm_agent="${_bsd_}/agent/.agents/mem-inst.jar"
 _opt_interp="${INTERP:-spark}"
 
-function java_exec { java ${JAVA_OPTS} -javaagent:"${_jvm_agent}" $@ ; }
+function java_exec {
+    java ${JAVA_OPTS} \
+         -javaagent:"${_jvm_agent}" \
+         -Djava.library.path="${_bsd_}/native_lib/libtensorflow.so" \
+         $@
+}
 
 # TODO: Ammonite does not pass instrument libraries to the REPL
 # Using the default Ammonite REPL
