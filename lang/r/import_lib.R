@@ -12,4 +12,10 @@ import.pkgs <- function (...) {
     }
 }
 
-import.pkgs('plyr', 'glmnet', 'caret', 'ggplot2', 'prophet', 'forecast')
+import.pkgs(
+    'plyr',
+    'glmnet',
+    'prophet',
+    #'forecast'
+    'ggplot2'
+)

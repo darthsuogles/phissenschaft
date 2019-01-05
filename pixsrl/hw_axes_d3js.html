@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<body>
+  <script src="https://d3js.org/d3.v5.js"></script>
+  <script>
+
+   // set the dimensions and margins of the graph
+   const margin = {top: 20, right: 20, bottom: 70, left: 50}
+   const width = 960 - margin.left - margin.right;
+   const height = 500 - margin.top - margin.bottom;
+
+   // append the svg obgect to the body of the page
+   // appends a 'group' element to 'svg'
+   // moves the 'group' element to the top left margin
+   var svg = d3.select("body").append("svg")
+	       .attr("width", width + margin.left + margin.right)
+	       .attr("height", height + margin.top + margin.bottom)
+	       .append("g")
+	       .attr("transform",
+		     "translate(" + margin.left + "," + margin.top + ")");
+
+   const targets = ["Car", "Trucks", "Motorcycles", "Bikes", "Pedestrans", "Signs", "Lights"],
+	 dayWeathers = ["sunny", "rainy", "overcast", "snow"],
+	 nightWeathers = ["rainy", "clear"],
+	 baseConditions = ["day", "dask", "night"],
+	 // alternatively colorbrewer.YlGnBu[9]
+	 colors = ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#253494","#081d58"]
+
+   var conditions = []
+   for (const cond of baseConditions) {
+     for (const weather of dayWeathers) {
+       conditions.push(weather + "-" + cond);
+     }
+     for (const weather of nightWeathers) {
+       conditions.push(weather + "-" + cond);
+     }
+   }
+
+   var dataset = [];
+   const targetInds = Array.from(Array(targets.length).keys());
+   const conditionInds = Array.from(Array(conditions.length).keys());
+   for (const target of targetInds) {
+     for (const condition of conditionInds) {
+       dataset.push({
+	 "target": target + 1,
+	 "condition": condition + 1,
+	 "value": target + condition,
+       });
+     }
+   }
+
+   // set the ranges
+   const x = d3.scalePoint(targets)
+	       .domain(targets)
+	       .range([0, width]);
+   const xAxis = d3.axisBottom(x)
+
+   svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", ".15em")
+      .attr("transform", "rotate(-45)");
+
+  </script>
+</body>
