@@ -8,15 +8,15 @@ UNREAL_ENGINE_PATH="${UNREAL_ENGINE_ROOT}/${UNREAL_ENGINE_VERSION}"
 
 [[ -d "${UNREAL_ENGINE_PATH}" ]] || \
     git clone --depth=1 \
-	-b "${UNREAL_ENGINE_VERSION}" \
-	https://github.com/EpicGames/UnrealEngine.git \
-	"${UNREAL_ENGINE_PATH}"
+	    -b "${UNREAL_ENGINE_VERSION}" \
+	    https://github.com/EpicGames/UnrealEngine.git \
+	    "${UNREAL_ENGINE_PATH}"
 
 function rebuild_unreal_engine_image {
 
     nvidia-docker build "$(mktemp -d)" \
-		  -t unreal-engine-builder:base \
-		  -f -<<'_DOCKERFILE_EOF_'
+		          -t unreal-engine-builder:base \
+		          -f -<<'_DOCKERFILE_EOF_'
 
 FROM nvidia/opengl:1.0-glvnd-devel-ubuntu16.04
 
@@ -105,39 +105,39 @@ _ENTRYPOINT_EOF_
     docker rm -f unreal-engine-prebuilder >&/dev/null || true
 
     nvidia-docker run -d \
-		  --name unreal-engine-prebuilder \
-		  --env CONTAINER_USER_ID="$(id -u)" \
-		  --env CONTAINER_USER_NAME=carla \
-		  --volume "${UNREAL_ENGINE_ROOT}":/opt/unreal_engine \
-		  --volume "${PWD}":/workspace \
-		  unreal-engine-builder:base \
-		  /workspace/._prepare_and_await.sh
+		          --name unreal-engine-prebuilder \
+		          --env CONTAINER_USER_ID="$(id -u)" \
+		          --env CONTAINER_USER_NAME=carla \
+		          --volume "${UNREAL_ENGINE_ROOT}":/opt/unreal_engine \
+		          --volume "${PWD}":/workspace \
+		          unreal-engine-builder:base \
+		          /workspace/._prepare_and_await.sh
 
     printf "Wait for a while prepared ... "
     sleep 7
     printf "done\n"
-    
+
     nvidia-docker exec -it \
-		  unreal-engine-prebuilder \
-		  /usr/local/bin/gosu carla /bin/bash \
-		  "/opt/unreal_engine/${UNREAL_ENGINE_VERSION}/Setup.sh"
+		          unreal-engine-prebuilder \
+		          /usr/local/bin/gosu carla /bin/bash \
+		          "/opt/unreal_engine/${UNREAL_ENGINE_VERSION}/Setup.sh"
 
     docker commit unreal-engine-prebuilder \
-	   "unreal-engine-builder:${UNREAL_ENGINE_VERSION}"
-    
+	       "unreal-engine-builder:${UNREAL_ENGINE_VERSION}"
+
     docker rm -f unreal-engine-prebuilder >&/dev/null || true
 }
 
 function init_unreal_engine_builder {
     docker rm -f unreal-engine-builder-env >&/dev/null || true
-    
+
     nvidia-docker run -d \
-		  --name unreal-engine-builder-env \
-		  --volume "${UNREAL_ENGINE_ROOT}":/opt/unreal_engine \
-		  --volume "${PWD}":/workspace \
-		  --workdir "/opt/unreal_engine/${UNREAL_ENGINE_VERSION}" \
-		  "unreal-engine-builder:${UNREAL_ENGINE_VERSION}" \
-		  sleep infinity       
+		          --name unreal-engine-builder-env \
+		          --volume "${UNREAL_ENGINE_ROOT}":/opt/unreal_engine \
+		          --volume "${PWD}":/workspace \
+		          --workdir "/opt/unreal_engine/${UNREAL_ENGINE_VERSION}" \
+		          "unreal-engine-builder:${UNREAL_ENGINE_VERSION}" \
+		          sleep infinity
 }
 
 [[ "yes" == "${REBUILD_IMAGE:-no}" ]] && rebuild_unreal_engine_image
@@ -146,7 +146,7 @@ init_unreal_engine_builder
 
 function unreal_exec {
     nvidia-docker exec -it unreal-engine-builder-env \
-		  /usr/local/bin/gosu carla $@
+		          /usr/local/bin/gosu carla $@
 }
 
 unreal_exec ./GenerateProjectFiles.sh

@@ -10,9 +10,14 @@ object LibVer {
 
   lazy val scalameta = "3.6.0"
   lazy val scalameta_2_12 = "3.6.0"
+
   // Spark
   lazy val spark = "2.4.0"
   lazy val sparkMaster = "3.0.0-SNAPSHOT"
+
+  // TensorFlow
+  lazy val tensorflowMaster = "0.4.2-SNAPSHOT"
+
   // Akka: https://github.com/akka/akka/releases
   lazy val akka = "2.5.19"
   // BEAM via Scio
@@ -40,10 +45,16 @@ object LibDeps {
     "spark-mllib",
     "spark-graphx"
   )
+
   lazy val sparkMaster = sparkModules.map {
     "org.apache.spark" %% _ % LibVer.sparkMaster }
+
   lazy val spark = sparkModules.map {
     "org.apache.spark" %% _ % LibVer.spark }
+
+  lazy val tensorflowMaster = Seq(
+    "org.platanios" %% "tensorflow" % LibVer.tensorflowMaster
+  )
 
   lazy val ammonite = Seq(
     // Ammonite needs full scala version to match

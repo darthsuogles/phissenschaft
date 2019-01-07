@@ -4,7 +4,7 @@ set -euo pipefail
 
 _bsd_="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-spark_ver=2.3.2
+spark_ver=2.4.0
 spark_tarball="spark-${spark_ver}-bin-hadoop2.7.tgz"
 spark_dir="${spark_tarball%.*}"
 
@@ -19,7 +19,7 @@ function setup_spark_python_shell {
 cat << _PYSPARK_EOF_ > "${_repo_root}/.ipy3"
 #!/bin/bash
 ###########################################
-# This file is generated automatically 
+# This file is generated automatically
 ###########################################
 
 set -euo pipefail

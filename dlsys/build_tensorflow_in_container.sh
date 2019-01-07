@@ -81,12 +81,10 @@ RUN mkdir /usr/local/cuda-10.0/lib &&  \
     ln -s /usr/include/nccl.h /usr/local/cuda/include/nccl.h
 
 # Install bazel
-ENV BAZEL_VERSION 0.15.0
-RUN curl -fsSL -o /tmp/install_bazel.sh \
-        -O https://github.com/bazelbuild/bazel/releases/download/$BAZEL_VERSION/bazel-$BAZEL_VERSION-installer-linux-x86_64.sh \
-	&& chmod +x /tmp/install_bazel.sh \
-	&& /tmp/install_bazel.sh \
-	&& rm -f /tmp/install_bazel.sh
+RUN echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list && \
+    curl https://bazel.build/bazel-release.pub.gpg | apt-key add - && \
+    apt-get update && \
+    apt-get install -y bazel
 
 # Running bazel inside a `docker build` command causes trouble, cf:
 #   https://github.com/bazelbuild/bazel/issues/134

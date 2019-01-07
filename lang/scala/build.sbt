@@ -47,7 +47,8 @@ lazy val repl = (project in file("repl")).
   settings(
     name := "repl",
     scalaVersion := LibVer.scala,
-    libraryDependencies ++= LibDeps.ammonite ++ LibDeps.akka
+    libraryDependencies ++=
+      LibDeps.ammonite ++ LibDeps.akka ++ LibDeps.tensorflowMaster
   ).aggregate(agent).aggregate(core).dependsOn(core)
 
 lazy val agent = (project in file("agent")).
