@@ -4,15 +4,19 @@
 // scalastyle:off
 import java.util.concurrent
 
-class SmplRunnable(tid: Int) extends Runnable {
+// Runnable is a Java language feature
+// For the equivalent version that returns a value, try Callable
+class SleepAndPrintRunnable(threadIdx: Int) extends Runnable {
   override def run(): Unit = {
     Thread.sleep(4000)
-    println(s"[Thread::$tid] from runnable")
+    println(s"[Thread::$threadIdx] from runnable")
   }
 }
 
-val t1 = new Thread(new SmplRunnable(1))
-val t2 = new Thread(new SmplRunnable(2))
+// In general, one should avoid directly using Threads.
+// Instead try Executor with a ThreadPool
+val t1 = new Thread(new SleepAndPrintRunnable(1))
+val t2 = new Thread(new SleepAndPrintRunnable(2))
 
 t1.start()
 t2.start()
@@ -25,6 +29,8 @@ class MessageLoop extends Runnable {
     "A kid will eat ivy too"
   )
 
+  // We use "pass-by-value" or "macro" so that things are not evaluated
+  // right away if we determine not to print the results
   def msg(text: => String): Unit = {
     println(s"[Thread::${Thread.currentThread().getName()}] ${text}")
   }

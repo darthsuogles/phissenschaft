@@ -24,6 +24,7 @@ lazy val root = (project in file(".")).
     publishArtifact := false
   ).aggregate(
     /* Core modules */
+    core,
     repl,
     agent,
     /* REPL: Apache Spark */
@@ -37,7 +38,7 @@ lazy val core = (project in file("core")).
   settings(
     name := "core",
     publishArtifact := false
-  ).aggregate(repl)
+  )
 
 lazy val ammonite = (project in file("ammonite"))
 
@@ -46,8 +47,9 @@ lazy val repl = (project in file("repl")).
   settings(
     name := "repl",
     scalaVersion := LibVer.scala,
-    libraryDependencies ++= LibDeps.ammonite
-  ).aggregate(agent)
+    libraryDependencies ++=
+      LibDeps.ammonite ++ LibDeps.akka ++ LibDeps.tensorflowMaster
+  ).aggregate(agent).aggregate(core).dependsOn(core)
 
 lazy val agent = (project in file("agent")).
   settings(commonSettings: _*).
@@ -70,60 +72,3 @@ lazy val sparkRepl = (project in file(".spark.repl"))
     name := "sparkRepl",
     libraryDependencies ++= LibDeps.spark
   ).aggregate(repl).dependsOn(repl)
-
-// // Third party tools
-// lazy val scio = (project in file("scio"))
-//   .settings(
-//     name := "scio",
-//     scalaVersion := LibVer.scala_2_12,
-//     dependencyOverrides ++= Seq(
-//       "io.grpc" %% "grpc-core" % "1.6.1"
-//     )
-//   )
-
-// // http://www.scala-sbt.org/1.x/docs/Library-Management.html#Overriding+a+version
-// lazy val scioRepl = (project in file(".scio.repl"))
-//   .settings(
-//     name := "scio-repl",
-//     scalaVersion := LibVer.scala_2_12,
-//     dependencyOverrides ++= Seq(
-//       "io.grpc" %% "grpc-core" % "1.6.1"
-//     )
-//   ).aggregate(scio, ammonite).dependsOn(scio, ammonite)
-
-// // TODO: check these `spPackage::artifactPath`
-// lazy val spkgs = (project in file(".spark-packages")).
-//   settings(
-//     scalaVersion := LibVer.scala,
-//     sparkVersion := LibVer.spark
-//   )
-//   .dependsOn(spkgAvro, spkgCoreNLP)
-//   .aggregate(spkgAvro, spkgCoreNLP)
-
-// lazy val spkgAvro = (project in file("spark-avro")).
-//   settings(
-//     scalaVersion := LibVer.scala,
-//     sparkVersion := LibVer.spark,
-//     name := "spark-avro",
-//     version := "0.3.0-edge-SNAPSHOT",
-//     spName := s"databricks/${name.value}"
-//   )
-
-// lazy val spkgCoreNLP = (project in file("spark-corenlp")).
-//   settings(
-//     scalaVersion := LibVer.scala,
-//     sparkVersion := LibVer.spark,
-//     sparkComponents ++= Seq(
-//       "sql", "core"
-//     ),
-//     libraryDependencies ++= Seq(
-//       "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0",
-//       "com.google.protobuf" % "protobuf-java" % "2.6.1"
-//       //"edu.stanford.nlp" % "stanford-corenlp" % "3.6.0" % "test" classifier "models",
-//       //"org.scalatest" %% "scalatest" % "2.2.6" % "test"
-//     ),
-//     organization := "databricks",
-//     name := "spark-corenlp",
-//     version := "0.3.0-edge-SNAPSHOT",
-//     spName := s"databricks/${name.value}"
-//   )

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+  <head>
+    <style>
+     rect.bordered {
+       stroke: #E6E6E6;
+       stroke-width:2px;
+     }
+
+     text.mono {
+       font-size: 9pt;
+       font-family: Consolas, courier;
+       fill: #aaa;
+     }
+
+     text.axis-workweek {
+       fill: #000;
+     }
+
+     text.axis-worktime {
+       fill: #000;
+     }
+    </style>
+    <script src="http://d3js.org/d3.v5.js"></script>
+  </head>
+  <body>
+    <div id="chart"></div>
+    <div id="dataset-picker">
+    </div>
+    <script type="text/javascript">
+     var margin = { top: 100, right: 0, bottom: 100, left: 100 },
+         width = 960 - margin.left - margin.right,
+         height = 430 - margin.top - margin.bottom,
+         gridSize = Math.floor(width / 24),
+         legendElementWidth = gridSize*2,
+         buckets = 9,
+	 targets = ["Car", "Trucks", "Motorcycles", "Bikes", "Pedestrans", "Signs", "Lights"],
+	 dayWeathers = ["sunny", "rainy", "overcast", "snow"],
+	 nightWeathers = ["rainy", "clear"],
+	 baseConditions = ["day", "dask", "night"],
+	 // alternatively colorbrewer.YlGnBu[9]
+         colors = ["#ffffd9","#edf8b1","#c7e9b4","#7fcdbb","#41b6c4","#1d91c0","#225ea8","#253494","#081d58"]
+
+     var conditions = []
+     for (const cond of baseConditions) {
+       for (const weather of dayWeathers) {
+	 conditions.push([weather + "-" + cond]);
+       }
+       for (const weather of nightWeathers) {
+	 conditions.push([weather + "-" + cond]);
+       }
+     }
+
+     var dataset = [];
+     const targetInds = Array.from(Array(targets.length).keys());
+     const conditionInds = Array.from(Array(conditions.length).keys());
+     for (const target of targetInds) {
+       for (const condition of conditionInds) {
+	 dataset.push({
+	   "target": target + 1,
+	   "condition": condition + 1,
+	   "value": target + condition,
+	 });
+       }
+     }
+
+     var svg = d3.select("#chart").append("svg")
+		 .attr("width", width + margin.left + margin.right)
+		 .attr("height", height + margin.top + margin.bottom)
+		 .append("g")
+		 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+     svg.selectAll(".targetLabels")
+	.data(targets)
+	.enter().append("text")
+	.text(function (d) { return d; })
+	.style("text-anchor", "end")
+	.attr("transform", function (d, i) {
+	  return "translate(-" + gridSize / 3 + ", " + gridSize / 2 + ")" +
+		 "translate(0, " + i * gridSize + ") " +
+		 "";
+	})
+	.attr("class", function (d, i) {
+	  return "mono axis axis-workweek"; });
+
+     svg.selectAll(".conditionLabels")
+	.data(conditions)
+	.enter().append("text")
+	.text(function (d) { return d; })
+	.style("text-anchor", "start")
+	.attr("transform", function (d, i) {
+	  return "translate(" + i * gridSize + ", 0) " +
+		 "translate(" + gridSize / 2 + ", -3) " +
+		 "rotate(-45) " +
+		 ""; })
+	.attr("class", function (d, i) {
+	  return "mono axis axis-workweek"; });
+
+     var colorScale = d3.scaleQuantile()
+			.domain([0, buckets - 1, d3.max(dataset, function (d) { return d.value; })])
+			.range(colors);
+
+     var cards = svg.selectAll(".cards")
+		    .data(dataset, function(d) { return d.target + ':' + d.condition; });
+
+     cards.append("title");
+
+     cards.enter().append("rect")
+	  .attr("x", function(d) { return (d.condition - 1) * gridSize; })
+	  .attr("y", function(d) { return (d.target - 1) * gridSize; })
+	  .attr("rx", 4)
+	  .attr("ry", 4)
+	  .attr("class", "hour bordered")
+	  .attr("width", gridSize)
+	  .attr("height", gridSize)
+	  .style("fill", function (d) { return colorScale(d.value); });
+
+
+     const quantileMarkers = [0].concat(colorScale.quantiles());
+
+     const legendShiftY = 50;
+
+     svg.selectAll(".legend")
+	.data(quantileMarkers, function (d) { return d; })
+	.enter().append("g")
+	.attr("transform", "translate(0" + ", " + legendShiftY + ")")
+	.attr("class", "legend")
+	.append("rect")
+	.attr("x", function(d, i) { return legendElementWidth * i; })
+	.attr("y", height)
+	.attr("width", legendElementWidth)
+	.attr("height", gridSize / 2)
+	.style("fill", function(d, i) { return colors[i]; });
+
+     svg.selectAll(".legendText")
+	.data(quantileMarkers, function (d) { return d; })
+	.enter()
+	.append("text")
+	.attr("class", "mono")
+	.text(function(d) { return "≥ " + Math.round(d); })
+	.attr("x", function(d, i) { return legendElementWidth * i; })
+	.attr("y", height + gridSize + legendShiftY);
+
+    </script>
+  </body>
+</html>
