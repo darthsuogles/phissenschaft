@@ -5,7 +5,8 @@
 
 namespace db {
 
-constexpr size_t LMDB_MAP_SIZE = 1099511627776; // 1 TB
+//constexpr size_t LMDB_MAP_SIZE = 1099511627776; // 1 TB
+constexpr size_t LMDB_MAP_SIZE = 1 << 16; // 1 TB
 
 //constexpr CAFFE_ENFORCE_EQ(int src, int ) {}
 
@@ -142,6 +143,7 @@ LMDB::LMDB(const std::string& source, Mode mode) : DB(source, mode) {
   MDB_CHECK(mdb_env_create(&mdb_env_));
   MDB_CHECK(mdb_env_set_mapsize(mdb_env_, LMDB_MAP_SIZE));
   //CAFFE_ENFORCE_EQ(mkdir(source.c_str(), 0744), 0, "mkdir ", source, " failed");
+  mkdir(source.c_str(), 0744);
   int flags = 0;
   if (mode == READ) {
     flags = MDB_RDONLY | MDB_NOTLS | MDB_NOLOCK;
