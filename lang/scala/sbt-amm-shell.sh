@@ -20,7 +20,7 @@ _bsd_="$(cd "$(dirname "$(tracelink "${BASH_SOURCE[0]}")")" && pwd)"
 
 JAVA_OPTS="-Xmx20G -Xms512M"
 _jvm_agent="${_bsd_}/agent/.agents/mem-inst.jar"
-_opt_interp="${INTERP:-spark}"
+_opt_interp="${INTERP:-spark_master}"
 
 function java_exec {
     java ${JAVA_OPTS} \
@@ -34,17 +34,25 @@ _SPARK_JAVA_CLASSPATH="${_bsd_}/spark-3.0.0-SNAPSHOT-bin-master-build/jars/*"
 # Using our customized Ammonite based REPL
 function repl_mod {
     java_exec \
-         -cp "$(cat "${_bsd_}/repl/.sbt.classpath/SBT_RUNTIME_CLASSPATH")" \
-         y.phi9t.repl.ReplMain \
-         $@
+        -cp "$(cat "${_bsd_}/repl/.sbt.classpath/SBT_RUNTIME_CLASSPATH")" \
+        y.phi9t.repl.ReplMain \
+        $@
 }
 
-# Using our customized Ammonite based REPL + Spark
+# Using our customized Ammonite based REPL + Spark (custom build)
+function repl_spark_master_mod {
+    java_exec \
+        -cp "${_SPARK_JAVA_CLASSPATH}:$(cat "${_bsd_}/.spark.repl/.sbt.classpath/SBT_RUNTIME_CLASSPATH")" \
+        y.phi9t.repl.ReplMain \
+        $@
+}
+
+# Using our customized Ammonite based REPL + Spark (sbt release)
 function repl_spark_mod {
     java_exec \
-         -cp "${_SPARK_JAVA_CLASSPATH}:$(cat "${_bsd_}/.spark.repl/.sbt.classpath/SBT_RUNTIME_CLASSPATH")" \
-         y.phi9t.repl.ReplMain \
-         $@
+        -cp "$(cat "${_bsd_}/.spark.repl/.sbt.classpath/SBT_RUNTIME_CLASSPATH")" \
+        y.phi9t.repl.ReplMain \
+        $@
 }
 
 # Using standard Scala REPL
@@ -58,6 +66,7 @@ function repl_scala {
 
 case "${_opt_interp}" in
     mod) repl_mod ;;
+    spark_master) repl_spark_master_mod ;;
     spark) repl_spark_mod ;;
     scala) repl_scala ;;
     \?) >&2 echo "unknown REPL type ${_opt_interp}"

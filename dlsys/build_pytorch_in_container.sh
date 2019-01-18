@@ -13,7 +13,7 @@ _SCRIPT_LOCATION_WARNING_EOF_
 
 declare -xr BASE_DOCKER_IMAGE="nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04"
 # Don't pull the latest version unless absolutely have to
-# docker pull "${BASE_DOCKER_IMAGE}"
+docker pull "${BASE_DOCKER_IMAGE}"
 
 nvidia-docker build "$(mktemp -d)" \
 	      --build-arg BASE_DOCKER_IMAGE="${BASE_DOCKER_IMAGE}" \
@@ -42,7 +42,7 @@ RUN curl -fsSL -o /tmp/miniconda.sh \
          -O https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
     chmod +x /tmp/miniconda.sh && \
     /tmp/miniconda.sh -b -p /opt/conda && \
-    rm /tmp/miniconda.sh 
+    rm /tmp/miniconda.sh
 
 RUN /opt/conda/bin/conda install -y \
     python=$PYTHON_VERSION \
@@ -50,10 +50,16 @@ RUN /opt/conda/bin/conda install -y \
     pyyaml \
     scipy \
     ipython \
-    mkl \
-    mkl-include \
     cython \
     typing
+
+RUN /opt/conda/bin/conda install -y -c intel \
+    mkl \
+    mkl-include \
+    mkl-dnn
+
+RUN /opt/conda/bin/conda install -y -c pytorch \
+    magma-cuda100
 
 RUN /opt/conda/bin/conda clean -ya
 

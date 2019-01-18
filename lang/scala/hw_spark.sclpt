@@ -1,0 +1,138 @@
+import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import org.apache.spark.ml.image.ImageSchema
+import org.apache.spark.sql.types._
+
+import scala.util.Try
+import java.nio.file.{Path, Paths, Files}
+import y.phi9t.core.FPath
+import FPath.implicits._
+
+// import $ivy.`com.pingcap.tispark:tispark-core:1.1`
+// import $ivy.`com.pingcap.tikv:tikv-client:1.1`
+
+def BLOCK[T](banner: String)(R: => T): T = {
+  println($"block: $banner")
+  R
+}
+
+// Create Spark session
+implicit val spark = { SparkSession
+  .builder
+  .config("spark.local.dir", "/workspace/spark_cache")
+  .config("spark.driver.host", "10.160.64.101")
+  .config("spark.executor.memory", "10G")
+  .master("local[4]")
+  //.master("spark://10.160.64.101:7077")
+  .appName("REPL")
+  .getOrCreate()
+}
+import spark.sqlContext.implicits._
+
+spark.conf.set("spark.sql.execution.arrow.enabled", "true")
+
+
+implicit val sc = spark.sparkContext
+sc.setLogLevel("ERROR")
+println(s"Spark parallelism: ${sc.defaultParallelism}")
+
+
+// val datasetRootFP = new FPath(Paths.get("/xmotors_ai_shared/datasets/incubator"))
+// val datasetFP = datasetRootFP / "mkz" / "20180726"
+val datasetRootFP = new FPath(Paths.get("/xmotors_ai_shared/datasets/stable"))
+val datasetFP = datasetRootFP / "test"
+
+// TODO: fix the implicits
+val imagesDF = Try {
+  spark.read.parquet((datasetFP / "data.parquet").toString)
+}.getOrElse {
+  // Coalesce too much and it will fail
+  // val imagesDF = spark
+  //   .read
+  //   .format("image")
+  //   .load((datasetFP / "**").toString)
+  // imagesDF.write.mode("overwrite").parquet((datasetFP / "mkz.parquet").toString)
+  val imagesDF = spark
+    .read
+    .format("image")
+    .load((datasetFP / "**").toString)
+  imagesDF.write.mode("overwrite").parquet((datasetFP / "data.parquet").toString)
+  imagesDF
+}.persist()
+
+imagesDF.storageLevel
+imagesDF.printSchema
+
+imagesDF.count
+
+imagesDF.select("image.origin").filter { row =>
+  row.getString(0).contains("/test7")
+}.count
+
+
+val df = { spark
+  .read
+  .option("header", "true")
+  .option("inferSchema", "true")
+  .csv("/xmotors_ai_shared/datasets/incubator/kaggle/train.csv")
+}
+
+
+df.printSchema
+val passengerCntsDF = df.groupBy($"passenger_count").count()
+passengerCntsDF.orderBy($"passenger_count").show
+
+df.stat.approxQuantile("passenger_count", Array(0.25, 0.5, 0.75, 0.95), 0.0)
+
+val cifarDF = spark.read.parquet((datasetFP / "data.parquet").toString)
+cifarDF.printSchema
+cifarDF.count()
+// cifarDF.select($"image.origin").filter { row =>
+//   row.getString(0).startsWith("xmotors")
+// }.count()
+
+cifarDF.filter($"image.origin".contains("motors")).count()
+
+val cifarSampleDF = cifarDF.sample(0.01).persist()
+cifarSampleDF.printSchema
+cifarSampleDF.count
+
+val ss = cifarSampleDF.select($"image.data").rdd.map { row =>
+  row.getAs[Array[Byte]](0).size
+}
+
+
+BLOCK("large images") {
+  val datasetRootFP = new FPath(Paths.get("/xmotors_ai_shared/datasets/incubator"))
+  val datasetFP = datasetRootFP / "mkz" / "20180726"
+
+  // // Please refrain from using Spark's own ImageSchema
+  // val df = Try {
+  //   spark.read.parquet((datasetFP / "data.parquet").toString)
+  // }.getOrElse {
+  //   // Coalesce too much and it will fail
+  //   val imagesDF = spark
+  //     .read
+  //     .format("image")
+  //     .load((datasetFP / "**").toString)
+  //   imagesDF.write.mode("overwrite").parquet((datasetFP / "data.parquet").toString)
+  //   imagesDF
+  // }.persist()
+
+  val columnSchema = StructType(
+    StructField("origin", StringType, true) ::
+    StructField("data", BinaryType, false) :: Nil)
+
+  val imageFields: Array[String] = columnSchema.fieldNames
+  val imageSchema = StructType(StructField("image", columnSchema, true) :: Nil)
+
+  val imageRawRDD = { sc
+    .binaryFiles((datasetFP / "**" / "*.jpg").toString)
+    .map { case (origin: String, bytes) =>
+      // TODO: make sure this bytes encoding is consistent
+      Row(Row(origin, bytes.toArray()))
+    }
+  }
+  val imageRawDF = spark.createDataFrame(imageRawRDD, imageSchema).persist()
+
+  imageRawDF.write.parquet((datasetFP / ".." / "data.raw.parquet").toString)
+}
