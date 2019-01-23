@@ -1,7 +1,7 @@
-from abc import ABC
-from collections import namedtuple
 import torch
 from torch import nn
+from tensorboardX import SummaryWriter
+import numpy as np
 
 
 class HParams(object):
@@ -16,12 +16,31 @@ class HParams(object):
         self.pixel_delta = 1
 
     def _update_stats(self, **kwargs):
+        """
+        Compute receptive field
+        """
         kernel_size = kwargs.get("kernel_size") or 1
         stride = kwargs.get("stride") or 1
         self.receptive_field += (kernel_size - 1) * self.pixel_delta
         self.pixel_delta *= stride
 
+    def conv2d_bn(self, out_channels, **kwargs):
+        """
+        Apply 2D convolution followed by batch normalization and ReLU
+        """
+        self.blocks.append(
+            nn.Conv2d(
+                in_channels=self.in_channels,
+                out_channels=out_channels,
+                **kwargs))
+        self.blocks.append(nn.BatchNorm2d(out_channels))
+        self.blocks.append(nn.ReLU(inplace=True))
+        self._update_stats(**kwargs)
+
     def conv2d(self, out_channels, **kwargs):
+        """
+        Apply 2D convolution followed by a ReLU
+        """
         self.blocks.append(
             nn.Conv2d(
                 in_channels=self.in_channels,
@@ -79,8 +98,37 @@ class AlexNet(nn.Module):
         return pre_logits
 
 
-net = AlexNet()
+def test_alex_net():
+    net = AlexNet()
 
-input_tensor = torch.zeros(2, 3, 227, 227)
-pre_logits = net.forward(input_tensor)
-feats = net.features(input_tensor)
+    input_tensor = torch.zeros(2, 3, 227, 227)
+    pre_logits = net.forward(input_tensor)
+    feats = net.features(input_tensor)
+
+    with SummaryWriter(comment="AlexPyTorch") as writer:
+        writer.add_graph(net, input_tensor, True)
+
+
+class Inception(nn.Module):
+    def __init__(self):
+        pass
+
+    def forward(self, input_tensor):
+        pass
+
+
+input_tensor = torch.randn(20, 3, 32, 64)
+batch_norm_fn = nn.BatchNorm2d(3, affine=False, momentum=0)
+
+arr = input_tensor.numpy()
+
+spatial_mean = arr.mean(axis=(0, 1))
+spatial_var = arr.var(axis=(0, 1))
+epsilon = batch_norm_fn.eps
+arr_normed = (arr - spatial_mean) / np.sqrt(spatial_var + epsilon)
+
+ss = nn.BatchNorm2d(3)(input_tensor)
+
+arr_expected = ss.detach().numpy()
+
+np.abs(arr_expected - arr_normed)
